@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --background: #050505;
+  --foreground: #f0f0f0;
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.3);
+  --secondary: #ec4899;
+  --accent: #10b981;
+  --panel-bg: rgba(20, 20, 25, 0.7);
+  --border: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Outfit', sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glass {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+.node {
+  cursor: pointer;
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node:hover {
+  stroke: var(--primary);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.link {
+  stroke: var(--border);
+  stroke-opacity: 0.4;
+  stroke-width: 1.5;
+  transition: stroke 0.3s;
+}
+
+.link.causal {
+  stroke-dasharray: 4;
+  animation: dash 20s linear infinite;
+}
+
+@keyframes dash {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+.status-pending { fill: #f59e0b; }
+.status-approved { fill: #10b981; }
+.status-rejected { fill: #ef4444; }
+.status-overridden { fill: #6366f1; }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr 300px;
+  height: 100vh;
+  gap: 16px;
+  padding: 16px;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

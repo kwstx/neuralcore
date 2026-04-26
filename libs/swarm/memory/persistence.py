@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
-from ..actor import NeuralActor
-from ..ontology_service import EpistemicEngine
+from ...actor import NeuralActor
+from ...ontology_service import EpistemicEngine
 
 class PersistentAgent(NeuralActor):
     """
