@@ -16,7 +16,7 @@ class HybridSubstrateManager:
     Orchestrates the dense vector storage and temporal graph persistence,
     leveraging the model ensemble and epistemic fusion for high-performance retrieval.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.postgres = PostgresKnowledgeStore()
         self.neo4j = Neo4jTemporalGraph()
         self.ensemble = CognitiveEnsemble()
@@ -32,10 +32,11 @@ class HybridSubstrateManager:
         self.connector_manager = TenantIsolationManager()
         self.reconciler = EventReconciliationProtocol()
         
-    def ingest_artifact(self, artifact_type: str, source_path: str, metadata: Dict[str, Any]):
+    def ingest_artifact(self, artifact_type: str, source_path: str, metadata: Dict[str, Any]) -> None:
         """
         Full lifecycle: Parse -> Unify -> Project -> Store.
         """
+        raw_out: Any = None
         # 1. Multi-modal parsing
         if artifact_type == "vision":
             raw_out = self.ensemble.process_vision(source_path, "Describe with high precision")
@@ -45,7 +46,7 @@ class HybridSubstrateManager:
             raw_out = self.ensemble.analyze_repository(source_path)
         
         # 2. Unification into graph nodes (Stubs for this demo)
-        unified_node = {
+        unified_node: Dict[str, Any] = {
             "id": f"node_{source_path}",
             "embedding": [0.1] * 768, # Placeholder
             "confidence": 0.98,
@@ -83,7 +84,7 @@ class HybridSubstrateManager:
         # Placeholder for complex multi-hop Cypher query
         return {"results": candidates, "latency_ms": 45.2}
 
-    def run_nightly_densification(self):
+    def run_nightly_densification(self) -> None:
         """
         Performs nightly graph densification through the differentiable 
         knowledge graph completion module.
@@ -103,7 +104,7 @@ class HybridSubstrateManager:
         
         print("Nightly densification complete. Knowledge gaps populated.")
 
-    def reconcile_beliefs(self):
+    def reconcile_beliefs(self) -> None:
         """
         Runs the Bayesian belief network submodule to reconcile contradictory facts
         and maintain a single source of truth.

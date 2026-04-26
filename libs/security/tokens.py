@@ -1,15 +1,15 @@
 import jwt
 import datetime
-from typing import List, Optional
+from typing import List, Optional, Set
 
 class CapabilityTokenService:
     """
     Issues and validates capability-based security tokens scoped to subgraphs.
     Supports atomic revocation.
     """
-    def __init__(self, secret_key: str):
+    def __init__(self, secret_key: str) -> None:
         self.secret_key = secret_key
-        self.revoked_tokens = set()
+        self.revoked_tokens: Set[str] = set()
 
     def issue_token(self, principal: str, allowed_subgraphs: List[str], expiration_minutes: int = 60) -> str:
         """
@@ -40,7 +40,7 @@ class CapabilityTokenService:
         except jwt.InvalidTokenError:
             return False
 
-    def revoke_token(self, token: str):
+    def revoke_token(self, token: str) -> None:
         """
         Revokes a capability token.
         """

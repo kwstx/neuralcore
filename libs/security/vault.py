@@ -1,13 +1,13 @@
 import hvac
 import os
-from typing import Optional
+from typing import Optional, Any
 
 class VaultKeyManager:
     """
     Manages per-tenant encryption keys using HashiCorp Vault.
     Supports HSM integration for on-prem installations.
     """
-    def __init__(self, url: str = None, token: str = None):
+    def __init__(self, url: Optional[str] = None, token: Optional[str] = None) -> None:
         self.url = url or os.getenv("VAULT_ADDR", "http://127.0.0.1:8200")
         self.token = token or os.getenv("VAULT_TOKEN")
         self.client = hvac.Client(url=self.url, token=self.token)
@@ -36,7 +36,7 @@ class VaultKeyManager:
             name=f"tenant-{tenant_id}",
             plaintext=plaintext.decode('utf-8')
         )
-        return response['data']['ciphertext']
+        return str(response['data']['ciphertext'])
 
     def decrypt_snapshot(self, tenant_id: str, ciphertext: str) -> bytes:
         """
@@ -46,4 +46,4 @@ class VaultKeyManager:
             name=f"tenant-{tenant_id}",
             ciphertext=ciphertext
         )
-        return response['data']['plaintext'].encode('utf-8')
+        return bytes(response['data']['plaintext'].encode('utf-8'))

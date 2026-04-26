@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Dict, Any
 import sys
 import os
 
@@ -17,17 +18,17 @@ class OrchestrationService(NeuralActor):
     Declaratively manages the swarm lifecycle, coordinating between 
     different agents and responding to deployment requests from the K8s Operator.
     """
-    def __init__(self, actor_id: str = "nc-orchestrator-01"):
+    def __init__(self, actor_id: str = "nc-orchestrator-01") -> None:
         super().__init__(actor_id=actor_id)
-        self.active_swarm = {}
+        self.active_swarm: Dict[str, Dict[str, Any]] = {}
 
-    async def on_start(self):
+    async def on_start(self) -> None:
         logger.info("Initializing Orchestration Context...")
         # Listen for spawn and lifecycle events
         await self.listen("swarm.lifecycle.spawn", self.handle_agent_spawn)
         await self.listen("swarm.lifecycle.terminate", self.handle_agent_terminate)
 
-    async def handle_agent_spawn(self, payload, embedding):
+    async def handle_agent_spawn(self, payload: Any, embedding: Any) -> None:
         """
         Coordinates the entry of a new agent into the swarm.
         """
@@ -50,14 +51,14 @@ class OrchestrationService(NeuralActor):
             "status": "ready"
         })
 
-    async def handle_agent_terminate(self, payload, embedding):
+    async def handle_agent_terminate(self, payload: Any, embedding: Any) -> None:
         """Cleanly removes an agent from the swarm registry."""
         agent_id = payload.get('body', {}).get('agent_id')
         if agent_id in self.active_swarm:
             del self.active_swarm[agent_id]
             logger.info(f"Agent {agent_id} removed from active swarm.")
 
-async def main():
+async def main() -> None:
     service = OrchestrationService()
     try:
         await service.boot()

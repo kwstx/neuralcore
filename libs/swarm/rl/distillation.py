@@ -8,7 +8,7 @@ class TrajectoryReplayer:
     """
     Replays successful trajectories into a self-distillation loop.
     """
-    def __init__(self, trajectory_db_path: str):
+    def __init__(self, trajectory_db_path: str) -> None:
         self.db_path = trajectory_db_path
 
     def fetch_successful_trajectories(self, confidence_threshold: float = 0.9) -> List[Dict[str, Any]]:
@@ -18,7 +18,7 @@ class TrajectoryReplayer:
         ]
 
 class SelfDistillationLoop:
-    def __init__(self, base_model_id: str):
+    def __init__(self, base_model_id: str) -> None:
         self.base_model_id = base_model_id
         self.replayer = TrajectoryReplayer("trajectories.db")
 
@@ -35,7 +35,7 @@ class SelfDistillationLoop:
             anonymized.append(log_copy)
         return anonymized
 
-    def apply_lora_adaptation(self, interaction_logs: List[Dict[str, Any]]):
+    def apply_lora_adaptation(self, interaction_logs: List[Dict[str, Any]]) -> None:
         """
         Applies LoRA adapters to base models. 
         In a real scenario, this would use the `peft` library.
@@ -49,11 +49,11 @@ class FederatedAveragingNode:
     Aggregates LoRA weights via federated averaging ensuring perpetual improvement 
     without central data exfiltration.
     """
-    def __init__(self, node_id: str):
+    def __init__(self, node_id: str) -> None:
         self.node_id = node_id
         self.local_weights: Optional[Dict[str, torch.Tensor]] = None
 
-    def compute_local_gradients(self, anonymized_logs: List[Dict[str, Any]]):
+    def compute_local_gradients(self, anonymized_logs: List[Dict[str, Any]]) -> None:
         # Local training step
         print(f"Node {self.node_id}: Computing local gradients on anonymized logs.")
         # self.local_weights = ...
@@ -82,7 +82,7 @@ class FederatedAggregator:
         print(f"Federated Aggregation: Consolidated LoRA adapters across {len(weight_list)} nodes.")
         return avg_weights
 
-def run_self_distillation_cycle(nodes: List[FederatedAveragingNode]):
+def run_self_distillation_cycle(nodes: List[FederatedAveragingNode]) -> None:
     """
     Main loop for swarm refinement.
     - Replays successful trajectories

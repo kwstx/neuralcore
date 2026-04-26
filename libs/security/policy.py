@@ -6,7 +6,7 @@ class PolicyDecisionPoint:
     Evaluates Rego policies at the edge using OPA.
     Queries the knowledge graph for dynamic attribute resolution.
     """
-    def __init__(self, opa_url: str = "http://opa.local/v1/data"):
+    def __init__(self, opa_url: str = "http://opa.local/v1/data") -> None:
         self.opa_url = opa_url
 
     async def evaluate(self, policy_path: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -21,7 +21,8 @@ class PolicyDecisionPoint:
                 json={"input": input_data}
             )
             response.raise_for_status()
-            return response.json().get("result", {})
+            res = response.json().get("result", {})
+            return res if isinstance(res, dict) else {}
 
     async def authorize(self, identity: Dict[str, Any], resource: str, action: str) -> bool:
         """
@@ -35,4 +36,4 @@ class PolicyDecisionPoint:
             "action": action,
         }
         result = await self.evaluate("neuralcore/authz", input_data)
-        return result.get("allow", False)
+        return bool(result.get("allow", False))

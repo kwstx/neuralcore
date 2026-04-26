@@ -3,6 +3,7 @@ import asyncio
 from concurrent import futures
 from google.protobuf import timestamp_pb2
 from google.protobuf import struct_pb2
+from typing import Any
 
 # These would be generated from the .proto file
 # import context_engine_pb2
@@ -11,10 +12,10 @@ from google.protobuf import struct_pb2
 from libs.context_engine import UniversalContextEngine
 
 class UniversalContextServiceServicer:
-    def __init__(self):
+    def __init__(self) -> None:
         self.engine = UniversalContextEngine()
 
-    async def GetContext(self, request, context):
+    async def GetContext(self, request: Any, context: Any) -> Any:
         """
         Handles the primary Universal Context Protocol request via gRPC.
         """
@@ -42,16 +43,16 @@ class UniversalContextServiceServicer:
             "metrics": {"latency_ms": 150.0, "source_count": bundle.metadata["source_count"]}
         }
 
-    async def ListTools(self, request, context):
+    async def ListTools(self, request: Any, context: Any) -> Any:
         """MCP Fallback: List available tools."""
         return {"tools": [{"name": "retrieval_agent", "description": "High-fidelity context retrieval"}]}
 
-    async def CallTool(self, request, context):
+    async def CallTool(self, request: Any, context: Any) -> Any:
         """MCP Fallback: Call a specific tool."""
         res = await self.engine.handle_mcp_fallback(request.name, dict(request.arguments))
         return {"content": res, "is_error": False}
 
-async def serve():
+async def serve() -> None:
     server = grpc.aio.server()
     # context_engine_pb2_grpc.add_UniversalContextServiceServicer_to_server(
     #     UniversalContextServiceServicer(), server

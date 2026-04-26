@@ -6,7 +6,7 @@ class OryIdentityManager:
     """
     Manages identity and sessions via Ory Kratos.
     """
-    def __init__(self, kratos_public_url: str = "http://kratos-public.local", kratos_admin_url: str = "http://kratos-admin.local"):
+    def __init__(self, kratos_public_url: str = "http://kratos-public.local", kratos_admin_url: str = "http://kratos-admin.local") -> None:
         self.public_url = kratos_public_url
         self.admin_url = kratos_admin_url
 
@@ -17,14 +17,15 @@ class OryIdentityManager:
                 headers={"Cookie": cookie_header}
             )
             if response.status_code == 200:
-                return response.json()
+                res = response.json()
+                return res if isinstance(res, dict) else None
         return None
 
 class OryRelationshipManager:
     """
     Manages relationship-based access control (ReBAC) via Ory Keto.
     """
-    def __init__(self, keto_read_url: str = "http://keto-read.local", keto_write_url: str = "http://keto-write.local"):
+    def __init__(self, keto_read_url: str = "http://keto-read.local", keto_write_url: str = "http://keto-write.local") -> None:
         self.read_url = keto_read_url
         self.write_url = keto_write_url
 
@@ -43,5 +44,5 @@ class OryRelationshipManager:
                 }
             )
             if response.status_code == 200:
-                return response.json().get("allowed", False)
+                return bool(response.json().get("allowed", False))
         return False

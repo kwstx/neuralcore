@@ -8,14 +8,14 @@ class SQLiteTemporalGraph:
     Local SQLite implementation of temporal graph persistence for smoke tests.
     Stores nodes and edges in a local .db file.
     """
-    def __init__(self, db_path: str = "neuralcore_local.db"):
+    def __init__(self, db_path: str = "neuralcore_local.db") -> None:
         self.db_path = db_path
         self._init_db()
 
-    def _get_connection(self):
+    def _get_connection(self) -> sqlite3.Connection:
         return sqlite3.connect(self.db_path)
 
-    def _init_db(self):
+    def _init_db(self) -> None:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             # Table for nodes
@@ -52,7 +52,7 @@ class SQLiteTemporalGraph:
         embedding: List[float],
         confidence: float,
         provenance: str
-    ):
+    ) -> None:
         timestamp = datetime.utcnow().isoformat()
         props_json = json.dumps(properties)
         embedding_blob = json.dumps(embedding).encode('utf-8')
@@ -72,7 +72,7 @@ class SQLiteTemporalGraph:
         target_id: str,
         rel_type: str,
         temporal_props: Dict[str, Any]
-    ):
+    ) -> None:
         timestamp = datetime.utcnow().isoformat()
         props_json = json.dumps(temporal_props)
         
@@ -101,5 +101,5 @@ class SQLiteTemporalGraph:
                 }
         return None
 
-    def close(self):
+    def close(self) -> None:
         pass

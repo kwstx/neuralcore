@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Dict, Any
 from libs.security.enclave import run_in_enclave
 from libs.substrate.manager import HybridSubstrateManager
-from libs.ontology_service.py import RDFTriples # Hypothetical if it exists, or I'll define a dataclass
+from libs.substrate.manager import HybridSubstrateManager
 
 class MultiModalIngestionPipeline:
     """
@@ -11,25 +11,25 @@ class MultiModalIngestionPipeline:
     Chains Whisper-v3 transcription with a VideoMAE-based spatiotemporal model.
     Extracts action items, decisions, and sentiment as RDF triples.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.substrate = HybridSubstrateManager()
         # Initialize models (Loading stubs for architecture)
         self.whisper = self._init_whisper()
         self.videomae = self._init_videomae()
 
-    def _init_whisper(self):
+    def _init_whisper(self) -> Any:
         # Whisper-large-v3 initialization logic
         print("DEBUG: Initializing Whisper-large-v3...")
         return None 
 
-    def _init_videomae(self):
+    def _init_videomae(self) -> Any:
         # VideoMAE backbone for spatiotemporal understanding
         # Fine-tuned for action item and decision extraction
         print("DEBUG: Initializing VideoMAE fine-tuned backbone...")
         return None
 
-    @run_in_enclave
-    def process_meeting(self, video_path: str, meeting_id: str):
+    @run_in_enclave # type: ignore
+    def process_meeting(self, video_path: str, meeting_id: str) -> Dict[str, Any]:
         """
         Main entry point for meeting processing.
         Executes inside a secure enclave.
@@ -103,7 +103,7 @@ class MultiModalIngestionPipeline:
         
         return triples
 
-    def _commit_to_substrate(self, triples: List[Dict[str, Any]]):
+    def _commit_to_substrate(self, triples: List[Dict[str, Any]]) -> None:
         """
         Atomically inserts triples into the Neo4j temporal graph and pgvector store.
         """

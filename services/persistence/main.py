@@ -9,6 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from libs.actor import NeuralActor
 from libs.ontology_service import EpistemicEngine
 from libs.utils.types import EmbeddingVector
+from typing import Dict, Any, List, Tuple
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PersistenceContext")
@@ -35,14 +36,14 @@ class PersistenceService(NeuralActor):
         # Subscribe to knowledge ingestion events
         await self.listen("knowledge.ingest", self.handle_knowledge_ingest)
         
-    async def handle_knowledge_ingest(self, payload: dict[str, any], embedding: EmbeddingVector) -> None:
+    async def handle_knowledge_ingest(self, payload: Dict[str, Any], embedding: EmbeddingVector) -> None:
         """
         Handles incoming triples, ensures epistemic consistency, 
         and updates the substrate (Postgres/pgvector + Neo4j).
         """
-        body: dict[str, any] = payload.get('body', {})
-        triples: list[tuple[str, str, str]] = body.get('triples', [])
-        metadata: dict[str, any] = payload.get('header', {})
+        body: Dict[str, Any] = payload.get('body', {})
+        triples: List[Tuple[str, str, str]] = body.get('triples', [])
+        metadata: Dict[str, Any] = payload.get('header', {})
         
         logger.info(f"Received {len(triples)} triples for substrate ingestion.")
         
@@ -69,7 +70,7 @@ class PersistenceService(NeuralActor):
             logger.warning("Ontological conflict. Rejecting update.")
             await self.send("persistence.conflict", {"error": "logical_inconsistency"})
 
-async def main():
+async def main() -> None:
     service = PersistenceService()
     try:
         await service.boot()

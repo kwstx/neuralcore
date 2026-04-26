@@ -41,7 +41,7 @@ class ProvenanceRecord(BaseModel):
         serialized = json.dumps(content, sort_keys=True)
         return hashlib.sha256(serialized.encode()).hexdigest()
 
-    def finalize(self):
+    def finalize(self) -> None:
         self.checksum = self.compute_hash()
 
 class GovernanceNode(BaseModel):
@@ -52,18 +52,18 @@ class GovernanceNode(BaseModel):
     override_reason: Optional[str] = None
 
 class GovernanceDAG:
-    def __init__(self):
+    def __init__(self) -> None:
         self.nodes: Dict[str, GovernanceNode] = {}
         self.edges: List[tuple[str, str]] = [] # (parent_id, child_id)
 
-    def add_execution(self, record: ProvenanceRecord):
-        node = GovernanceNode(node_id=record.record_id, record=record)
+    def add_execution(self, record: ProvenanceRecord) -> None:
+        node: GovernanceNode = GovernanceNode(node_id=record.record_id, record=record)
         self.nodes[node.node_id] = node
         for parent_id in record.parent_records:
             if parent_id in self.nodes:
                 self.edges.append((parent_id, node.node_id))
 
-    def trigger_override(self, node_id: str, human_id: str, reason: str):
+    def trigger_override(self, node_id: str, human_id: str, reason: str) -> Set[str]:
         """
         One-click human override that triggers immediate subgraph re-computation.
         """

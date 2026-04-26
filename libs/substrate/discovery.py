@@ -1,23 +1,23 @@
 import json
 from typing import Dict, List, Any
-from libs.substrate.completion.models import CognitiveEnsemble # Assuming this provides LLM access
-from libs.ontology_service import OntologyManager # Hypothetical service for registration
+from libs.substrate.ensemble.models import CognitiveEnsemble
+from libs.ontology_service import EpistemicEngine
 
 class ServiceDiscoveryEngine:
     """
     Scans internal/external service catalogs and uses LLMs to map schemas to the core ontology.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.catalogs = ["http://service-catalog/v1/services", "kube://services"]
         self.llm = self._load_schema_mapper_llm()
-        self.ontology_manager = OntologyManager()
+        self.ontology_manager = EpistemicEngine()
 
-    def _load_schema_mapper_llm(self):
+    def _load_schema_mapper_llm(self) -> Any:
         # Using a lightweight LLM (e.g. Mistral-7B or similar internal model)
         print("DEBUG: Loading lightweight LLM-based schema mapper...")
         return None
 
-    def discover_and_map(self):
+    def discover_and_map(self) -> None:
         """
         Periodic scan of service catalogs.
         """
@@ -52,7 +52,7 @@ class ServiceDiscoveryEngine:
             {"source_field": "timestamp", "ontology_target": ":precedes"}
         ]
 
-    def _register_mappings(self, source: str, mappings: List[Dict[str, str]]):
+    def _register_mappings(self, source: str, mappings: List[Dict[str, str]]) -> None:
         """
         Automically update the ontology and registration substrate.
         """

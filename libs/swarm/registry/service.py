@@ -18,7 +18,7 @@ class CapabilityRegistry:
         
         self.NC = Namespace("https://neuralcore.ai/ontology/")
 
-    def register_capability(self, tool_id: str, schema_rdf: str):
+    def register_capability(self, tool_id: str, schema_rdf: str) -> None:
         """
         Validates the tool schema against SHACL constraints before registration.
         """

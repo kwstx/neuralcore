@@ -2,6 +2,7 @@ import asyncio
 import os
 import time
 import numpy as np
+from typing import List, Dict, Any, Generator, Optional
 from opentelemetry import metrics
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader, ConsoleMetricExporter
@@ -55,12 +56,12 @@ def calculate_epistemic_entropy(confidence_scores: List[float]) -> float:
     return float(ent)
 
 class SwarmObservability:
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_entropy = 0.0
         self.current_coherence = 1.0
         self.total_load = 0
 
-    def update_brain_state(self, confidence_scores: List[float], coherence: float = 1.0, load_delta: int = 0):
+    def update_brain_state(self, confidence_scores: List[float], coherence: float = 1.0, load_delta: int = 0) -> None:
         """
         Updates the internal state and records the custom metric.
         """
@@ -70,10 +71,10 @@ class SwarmObservability:
         cognitive_load_counter.add(load_delta, {"swarm_id": "main"})
         print(f"Observability Plane: Entropy={self.current_entropy:.4f}, Coherence={self.current_coherence:.2f}")
 
-    def get_metrics_callback(self, options):
+    def get_metrics_callback(self, options: Any) -> Generator[metrics.Observation, None, None]:
         yield metrics.Observation(self.current_entropy, {"metric": "entropy"})
 
-    def get_coherence_callback(self, options):
+    def get_coherence_callback(self, options: Any) -> Generator[metrics.Observation, None, None]:
         yield metrics.Observation(self.current_coherence)
 
 # Register callbacks
@@ -91,16 +92,16 @@ def track_execution_latency(span_name: str):
     from opentelemetry import trace
     tracer = trace.get_tracer(__name__)
     
-    def decorator(func):
+    def decorator(func: Any) -> Any:
         if asyncio.iscoroutinefunction(func):
             @functools.wraps(func)
-            async def async_wrapper(*args, **kwargs):
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
                 with tracer.start_as_current_span(span_name):
                     return await func(*args, **kwargs)
             return async_wrapper
         else:
             @functools.wraps(func)
-            def sync_wrapper(*args, **kwargs):
+            def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
                 with tracer.start_as_current_span(span_name):
                     return func(*args, **kwargs)
             return sync_wrapper

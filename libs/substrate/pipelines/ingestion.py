@@ -1,19 +1,20 @@
-from airflow import DAG
-from airflow.sensors.base import BaseSensorOperator
-from airflow.operators.python import PythonOperator
+from airflow.sensors.base import BaseSensorOperator # type: ignore
+from airflow.operators.python import PythonOperator # type: ignore
+from airflow import DAG # type: ignore
 from datetime import datetime, timedelta
-import requests
+import requests # type: ignore
+from typing import Any, Dict
 
 class WebhookSensor(BaseSensorOperator):
     """
     Custom sensor that triggers on webhook events from integrated sources.
     Polling a temporary buffer or message queue for incoming events.
     """
-    def __init__(self, endpoint: str, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, endpoint: str, **kwargs: Any) -> None:
+        super().__init__(**kwargs) # type: ignore
         self.endpoint = endpoint
 
-    def poke(self, context):
+    def poke(self, context: Dict[str, Any]) -> bool:
         # Logic to check for new events at the endpoint
         response = requests.get(self.endpoint, timeout=10)
         if response.status_code == 200 and response.json().get("new_events"):
@@ -21,7 +22,7 @@ class WebhookSensor(BaseSensorOperator):
             return True
         return False
 
-def ingest_and_process(**context):
+def ingest_and_process(**context: Any) -> None:
     events = context['ti'].xcom_pull(key='events', task_ids='wait_for_webhook')
     # Logic to route artifacts to the CognitiveEnsemble
     print(f"Processing events: {events}")

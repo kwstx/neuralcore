@@ -3,6 +3,7 @@ import json
 import numpy as np
 from kafka import KafkaProducer
 from nats.aio.client import Client as NATS
+from typing import Any, Dict, List, Optional, Callable, Awaitable
 from .embedding_engine import NeuroSemanticEncoder
 
 class NeuroSemanticFabric:
@@ -13,21 +14,21 @@ class NeuroSemanticFabric:
     Attributes:
         encoder (NeuroSemanticEncoder): Computes 768-dim knowledge graph embeddings.
         kafka_producer (KafkaProducer): Handles high-throughput event ordering.
-        js (JetStreamContext): Handles low-latency, at-least-once delivery guarantees.
+        js (Any): Handles low-latency, at-least-once delivery guarantees (JetStreamContext).
     """
-    def __init__(self, kafka_bootstrap='localhost:9092', nats_url='nats://localhost:4222'):
+    def __init__(self, kafka_bootstrap: str = 'localhost:9092', nats_url: str = 'nats://localhost:4222') -> None:
         # Kafka for global event ordering and log persistence
-        self.kafka_producer = KafkaProducer(
+        self.kafka_producer: KafkaProducer = KafkaProducer(
             bootstrap_servers=kafka_bootstrap,
             compression_type='gzip',
             value_serializer=None # We handle prefixing ourselves
         )
-        self.nats_client = NATS()
-        self.nats_url = nats_url
-        self.encoder = NeuroSemanticEncoder()
-        self.js = None
+        self.nats_client: NATS = NATS()
+        self.nats_url: str = nats_url
+        self.encoder: NeuroSemanticEncoder = NeuroSemanticEncoder()
+        self.js: Any = None
 
-    async def connect(self):
+    async def connect(self) -> None:
         """Initializes NATS connection and JetStream context."""
         await self.nats_client.connect(
             self.nats_url,
@@ -43,7 +44,7 @@ class NeuroSemanticFabric:
             # Stream might already exist
             pass  # nosec B110
 
-    async def publish_event(self, subject: str, payload: dict, graph_context: dict = None):
+    async def publish_event(self, subject: str, payload: Dict[str, Any], graph_context: Optional[Dict[str, Any]] = None) -> None:
         """
         Publishes an event into the Fabric with semantic metadata.
         
@@ -77,7 +78,7 @@ class NeuroSemanticFabric:
         # Note: Kafka flush is handled asynchronously by the producer's background thread
         # for maximum throughput, but we could flush here if strict durability is required.
 
-    async def subscribe(self, subject: str, callback, queue_group: str = None):
+    async def subscribe(self, subject: str, callback: Callable[[Dict[str, Any], np.ndarray], Awaitable[None]], queue_group: Optional[str] = None) -> Any:
         """
         Subscribes to a subject with automatic embedding extraction.
         
@@ -86,7 +87,7 @@ class NeuroSemanticFabric:
             callback (coroutine): Function to handle (payload, embedding).
             queue_group (str, optional): For load-balanced consumer groups.
         """
-        async def internal_cb(msg):
+        async def internal_cb(msg: Any) -> None:
             try:
                 # Extract the 768-dim semantic header
                 embedding, raw_payload = NeuroSemanticEncoder.extract_embedding(msg.data)
@@ -109,7 +110,7 @@ class NeuroSemanticFabric:
             manual_ack=True
         )
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         """Graceful termination of fabric components."""
         self.kafka_producer.flush()
         self.kafka_producer.close()

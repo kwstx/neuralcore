@@ -2,7 +2,7 @@ import asyncio
 import logging
 import networkx as nx
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 from .evaluator import BrainHealthAssessment
 from .mcts import BusinessScenarioMCTS
@@ -16,11 +16,11 @@ class SelfImprovingLayer:
     Orchestrator for the Self-Improving Intelligence Layer.
     Operates as a closed-loop meta-learning subsystem.
     """
-    def __init__(self, tenant_id: str):
+    def __init__(self, tenant_id: str) -> None:
         self.tenant_id = tenant_id
         self.aggregator = PrivacyPreservingAggregator(epsilon=1.0)
         
-    async def weekly_optimization_loop(self):
+    async def weekly_optimization_loop(self) -> Tuple[Dict[str, float], Dict[str, Any]]:
         """
         Main loop: Assess -> Explore -> Aggregate -> Update.
         """

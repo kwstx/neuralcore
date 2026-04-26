@@ -1,7 +1,7 @@
 import time
 import random
 import asyncio
-from typing import Callable, Any, Type, Union
+from typing import Callable, Any, Type, Union, Tuple
 
 def exponential_backoff_with_jitter(
     attempt: int,
@@ -19,12 +19,12 @@ def exponential_backoff_with_jitter(
 
 async def retry_with_backoff(
     func: Callable[..., Any],
-    *args,
+    *args: Any,
     max_retries: int = 5,
     base_delay: float = 1.0,
     max_delay: float = 60.0,
-    retry_on: Union[Type[Exception], tuple[Type[Exception], ...]] = Exception,
-    **kwargs
+    retry_on: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
+    **kwargs: Any
 ) -> Any:
     """
     Executes a function with retry logic governed by exponential backoff and jitter.

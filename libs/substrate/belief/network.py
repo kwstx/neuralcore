@@ -10,11 +10,11 @@ class EpistemicBeliefNetwork:
     Bayesian belief network for reconciling contradictory facts using Pyro.
     Maintains a posterior distribution over each triple's validity.
     """
-    def __init__(self, lr: float = 0.01):
+    def __init__(self, lr: float = 0.01) -> None:
         self.lr = lr
         self.optim = Adam({"lr": self.lr})
 
-    def model(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor):
+    def model(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor) -> None:
         """
         Bayesian model for triple validity.
         evidence: observed validity (0 or 1) from various sources.
@@ -34,7 +34,7 @@ class EpistemicBeliefNetwork:
                 # Reliability acts as a weight on the observation
                 pyro.sample("obs", dist.Bernoulli(theta), obs=evidence)
 
-    def guide(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor):
+    def guide(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor) -> None:
         """
         Variational distribution (guide) for posterior inference.
         """
@@ -44,7 +44,7 @@ class EpistemicBeliefNetwork:
         with pyro.plate("triples", len(triple_ids)):
             pyro.sample("theta", dist.Beta(alpha_q, beta_q))
 
-    def reconcile(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor, num_steps: int = 500):
+    def reconcile(self, triple_ids: torch.Tensor, evidence: torch.Tensor, reliability: torch.Tensor, num_steps: int = 500) -> torch.Tensor:
         """
         Perform Variational Inference to update the posterior distribution.
         """
@@ -64,12 +64,12 @@ class EpistemicBeliefNetwork:
         return confidence
 
 class BeliefManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.network = EpistemicBeliefNetwork()
         # reliability_scores: SourceID -> Score
-        self.source_reliability = {} 
+        self.source_reliability: Dict[str, float] = {} 
 
-    def update_reliability(self, source_id: str, feedback_loop_score: float):
+    def update_reliability(self, source_id: str, feedback_loop_score: float) -> None:
         """Update source reliability based on historical agent feedback loops."""
         self.source_reliability[source_id] = feedback_loop_score
 

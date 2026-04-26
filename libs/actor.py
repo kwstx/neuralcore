@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from uuid import uuid4
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Callable
 from .fabric.backbone import NeuroSemanticFabric
 
 # Configure logging for the actor system
@@ -18,7 +18,7 @@ class NeuralActor:
         self.actor_id: str = actor_id or f"nc-actor-{uuid4().hex[:12]}"
         self.fabric: NeuroSemanticFabric = fabric or NeuroSemanticFabric()
         self.is_active: bool = False
-        self._subs: list[Any] = []
+        self._subs: List[Any] = []
 
     async def boot(self) -> None:
         """Initializes the actor and its fabric connection."""
@@ -49,7 +49,7 @@ class NeuralActor:
         }
         await self.fabric.publish_event(subject, message, graph_context=context)
 
-    async def listen(self, subject: str, handler: Any) -> None:
+    async def listen(self, subject: str, handler: Callable[..., Any]) -> None:
         """
         Registers a callback for semantic events matching the subject.
         """

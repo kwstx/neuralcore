@@ -1,7 +1,7 @@
 import asyncio
 import numpy as np
 import torch
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from .base import ContextEngineBase, ContextBundle
 from .tokenizer import MoETokenizer
@@ -10,7 +10,7 @@ from .retriever import HierarchicalRetriever
 from .cache import IntelligentCache
 
 class UniversalContextEngine(ContextEngineBase):
-    def __init__(self):
+    def __init__(self) -> None:
         self.tokenizer = MoETokenizer()
         self.router = MetaRouter()
         self.retriever = HierarchicalRetriever()
@@ -29,8 +29,8 @@ class UniversalContextEngine(ContextEngineBase):
         
         # 3. Hybrid Retrieval (FAISS + Neo4j)
         # Mocking an embedding (in reality, use an encoder like Llama-3-Embed)
-        embedding = np.random.rand(768).astype('float32')
-        raw_candidates = self.retriever.hybrid_retrieve(embedding)
+        embedding: np.ndarray = np.random.rand(768).astype('float32') # type: ignore
+        raw_candidates: List[Dict[str, Any]] = self.retriever.hybrid_retrieve(embedding)
         
         # 4. Context Optimization (PuLP Integer Linear Program)
         max_tokens = constraints.get('max_tokens', 2048)

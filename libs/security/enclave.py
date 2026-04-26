@@ -9,7 +9,7 @@ class SecureEnclave:
     Abstraction for AWS Nitro Enclaves or equivalent secure execution environments.
     Handles memory encryption, remote attestation, and data sealing.
     """
-    def __init__(self, enclave_id: str):
+    def __init__(self, enclave_id: str) -> None:
         self.enclave_id = enclave_id
         self.attestation_token = self._generate_attestation()
 
@@ -38,13 +38,13 @@ class SecureEnclave:
             return data
         raise PermissionError("Enclave attestation failed or data tampered.")
 
-def run_in_enclave(f: Callable) -> Callable:
+def run_in_enclave(f: Callable[..., Any]) -> Callable[..., Any]:
     """
     Decorator to ensure a function executes within a secure enclave context.
     Ensures memory encryption and attestation before invocation.
     """
     @wraps(f)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         # In production, this would trigger the Nitro NSM (Nitro Security Module) calls
         print(f"DEBUG: Attesting environment for {f.__name__} in Enclave...")
         return f(*args, **kwargs)

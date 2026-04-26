@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Any
 import sys
 import os
 
@@ -17,11 +18,11 @@ class RetrievalService(NeuralActor):
     Managed semantic vector search and associative knowledge retrieval 
     for agents in the swarm.
     """
-    async def on_start(self):
+    async def on_start(self) -> None:
         logger.info("Retrieval Context online. Awaiting semantic queries...")
         await self.listen("context.request", self.handle_context_request)
 
-    async def handle_context_request(self, payload, embedding):
+    async def handle_context_request(self, payload: Any, embedding: Any) -> None:
         """
         Uses the provided 768-dim embedding to perform a semantic lookup
         in the distributed knowledge store.
@@ -35,7 +36,7 @@ class RetrievalService(NeuralActor):
             "context_fragment": "Distributed substrate operational metrics: Epistemic consistency check passed."
         })
 
-async def main():
+async def main() -> None:
     service = RetrievalService()
     try:
         await service.boot()

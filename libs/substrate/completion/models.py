@@ -1,14 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple
+from typing import Tuple, Any
 
 class TemporalComplEx(nn.Module):
     """
     Differentiable Knowledge Graph Completion via Temporal ComplEx embeddings.
     Incorporates exponential decay for edge freshness.
     """
-    def __init__(self, num_entities: int, num_relations: int, embedding_dim: int, decay_rate: float = 0.01):
+    def __init__(self, num_entities: int, num_relations: int, embedding_dim: int, decay_rate: float = 0.01) -> None:
         super(TemporalComplEx, self).__init__()
         self.embedding_dim = embedding_dim
         self.decay_rate = nn.Parameter(torch.tensor([decay_rate]))
@@ -51,7 +51,7 @@ class TemporalComplEx(nn.Module):
         
         return score * decay
 
-def train_completion(model: TemporalComplEx, loader: torch.utils.data.DataLoader, epochs: int = 10, lr: float = 1e-3, grad_clip: float = 1.0):
+def train_completion(model: TemporalComplEx, loader: torch.utils.data.DataLoader[Any], epochs: int = 10, lr: float = 1e-3, grad_clip: float = 1.0) -> TemporalComplEx:
     """
     Optimized via AdamW with gradient clipping to proactively surface knowledge gaps.
     """

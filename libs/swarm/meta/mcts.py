@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 from .causal import CausalWorldModel
 
 class Node:
-    def __init__(self, state: Dict[str, Any], parent=None):
+    def __init__(self, state: Dict[str, Any], parent: Optional['Node'] = None) -> None:
         self.state = state
         self.parent = parent
         self.children: List['Node'] = []
@@ -14,7 +14,7 @@ class Node:
     def is_fully_expanded(self, possible_actions: List[Dict[str, Any]]) -> bool:
         return len(self.children) == len(possible_actions)
 
-    def best_child(self, exploration_weight: float = 1.41):
+    def best_child(self, exploration_weight: float = 1.41) -> 'Node':
         choices_weights = [
             (child.value / child.visits) + exploration_weight * math.sqrt((2 * math.log(self.visits) / child.visits))
             for child in self.children
@@ -26,7 +26,7 @@ class BusinessScenarioMCTS:
     Monte Carlo Tree Search agent that explores hypothetical business scenarios.
     Uses a CausalWorldModel to evaluate outcome rewards.
     """
-    def __init__(self, causal_model: CausalWorldModel, iterations: int = 100):
+    def __init__(self, causal_model: CausalWorldModel, iterations: int = 100) -> None:
         self.causal_model = causal_model
         self.iterations = iterations
 
@@ -63,11 +63,10 @@ class BusinessScenarioMCTS:
         """
         return self.causal_model.simulate_counterfactual(node.state)
 
-    def _backpropagate(self, node: Node, reward: float):
+    def _backpropagate(self, node: Optional[Node], reward: float) -> None:
         while node is not None:
             node.visits += 1
             node.value += reward
-            node.parent = node.parent 
             node = node.parent
 
     def _is_terminal(self, node: Node) -> bool:

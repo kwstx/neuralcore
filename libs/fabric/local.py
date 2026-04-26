@@ -1,7 +1,8 @@
 import asyncio
 import json
 import logging
-from typing import Dict, Any, Callable, List
+from typing import Dict, Any, Callable, List, Optional, Awaitable, Coroutine
+import numpy as np
 from .embedding_engine import NeuroSemanticEncoder
 
 logger = logging.getLogger("LocalFabric")
@@ -11,16 +12,16 @@ class LocalFabric:
     In-memory implementation of the Neuro-Semantic Fabric for local testing.
     Uses asyncio Queues to simulate event propagation without NATS/Kafka.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.encoder = NeuroSemanticEncoder()
-        self.subscriptions: Dict[str, List[Callable]] = {}
+        self.subscriptions: Dict[str, List[Callable[[Dict[str, Any], np.ndarray], Coroutine[Any, Any, Any]]]] = {}
         self._running = False
 
-    async def connect(self):
+    async def connect(self) -> None:
         logger.info("LocalFabric connected (in-memory mode).")
         self._running = True
 
-    async def publish_event(self, subject: str, payload: dict, graph_context: dict = None):
+    async def publish_event(self, subject: str, payload: Dict[str, Any], graph_context: Optional[Dict[str, Any]] = None) -> None:
         """
         Publishes an event locally.
         """
@@ -37,7 +38,7 @@ class LocalFabric:
                     # Create a task to run the handler
                     asyncio.create_task(handler(payload, embedding))
 
-    async def subscribe(self, subject: str, callback: Callable, queue_group: str = None):
+    async def subscribe(self, subject: str, callback: Callable[[Dict[str, Any], np.ndarray], Coroutine[Any, Any, Any]], queue_group: Optional[str] = None) -> Dict[str, Any]:
         """
         Subscribes to a subject.
         """
@@ -61,7 +62,7 @@ class LocalFabric:
             return subject.startswith(prefix)
         return subject == pattern
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         self._running = False
         self.subscriptions.clear()
         logger.info("LocalFabric shutdown.")

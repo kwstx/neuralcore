@@ -7,7 +7,7 @@ class EpistemicEmbeddingFusion(nn.Module):
     Innovative algorithm to project incoming vector embeddings into the graph space.
     Ensures semantic similarity queries resolve directly to precise multi-hop graph traversals.
     """
-    def __init__(self, vector_dim: int = 768, graph_space_dim: int = 768):
+    def __init__(self, vector_dim: int = 768, graph_space_dim: int = 768) -> None:
         super(EpistemicEmbeddingFusion, self).__init__()
         # Learned projection matrix W
         self.W = nn.Linear(vector_dim, graph_space_dim, bias=False)
@@ -16,13 +16,13 @@ class EpistemicEmbeddingFusion(nn.Module):
         """Project vector v_i into graph space."""
         return self.W(v_i)
 
-def contrastive_loss(e_i: torch.Tensor, proj_v_i: torch.Tensor, all_e_j: torch.Tensor, temperature: float = 0.07):
+def contrastive_loss(e_i: torch.Tensor, proj_v_i: torch.Tensor, all_e_j: torch.Tensor, temperature: float = 0.07) -> torch.Tensor:
     """
     Loss function: L = -log[exp(sim(e_i, proj(v_i))) / sum exp(sim(e_j, proj(v_j)))]
     Optimizes the projection matrix W against ground-truth triples.
     """
     # Calculate cosine similarity
-    def sim(a, b):
+    def sim(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
         return F.cosine_similarity(a, b, dim=-1)
 
     # Numerator: sim(e_i, proj(v_i))
@@ -45,11 +45,11 @@ def contrastive_loss(e_i: torch.Tensor, proj_v_i: torch.Tensor, all_e_j: torch.T
     return loss
 
 class FusionTrainer:
-    def __init__(self, model: EpistemicEmbeddingFusion, lr: float = 1e-4):
+    def __init__(self, model: EpistemicEmbeddingFusion, lr: float = 1e-4) -> None:
         self.model = model
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
-    def train_step(self, vector_batch: torch.Tensor, graph_node_batch: torch.Tensor, all_graph_nodes: torch.Tensor):
+    def train_step(self, vector_batch: torch.Tensor, graph_node_batch: torch.Tensor, all_graph_nodes: torch.Tensor) -> float:
         self.optimizer.zero_grad()
         
         # v_i -> proj(v_i)

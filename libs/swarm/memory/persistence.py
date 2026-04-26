@@ -1,18 +1,21 @@
+import logging
 from typing import Dict, Any, Optional
 from ...actor import NeuralActor
 from ...ontology_service import EpistemicEngine
+
+logger = logging.getLogger("PersistentAgent")
 
 class PersistentAgent(NeuralActor):
     """
     A persistent actor whose state is materialized from and synced to the knowledge graph.
     Inherits from NeuralActor and extends it with long-term memory capabilities.
     """
-    def __init__(self, agent_id: str, epistemic_engine: EpistemicEngine):
+    def __init__(self, agent_id: str, epistemic_engine: EpistemicEngine) -> None:
         super().__init__(actor_id=agent_id)
-        self.engine = epistemic_engine
+        self.engine: EpistemicEngine = epistemic_engine
         self.memory_view: Dict[str, Any] = {}
 
-    async def synchronize_memory(self):
+    async def synchronize_memory(self) -> None:
         """
         Materializes the agent's state from the knowledge graph.
         Uses a 'view' pattern to fetch only relevant semantic triples.
@@ -24,7 +27,7 @@ class PersistentAgent(NeuralActor):
         # to refresh the 'materialized view' of the agent's context.
         pass
 
-    async def persist_state(self):
+    async def persist_state(self) -> None:
         """
         Flushes the current actor state back to the knowledge graph as RDF triples.
         """
@@ -35,6 +38,6 @@ class PersistentAgent(NeuralActor):
         self.engine.ingest_triples(triples)
         logger.info(f"Persisted {len(triples)} state triples for {self.actor_id}")
 
-    async def on_start(self):
+    async def on_start(self) -> None:
         await self.synchronize_memory()
         await super().on_start()

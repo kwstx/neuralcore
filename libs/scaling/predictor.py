@@ -1,15 +1,15 @@
 import numpy as np
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import List, Dict, Any, cast
 
 class EpistemicLoadForecaster:
     """
     Forecasts swarm load from epistemic activity patterns (context updates, knowledge graph entropy).
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.history = []
     
-    def record_activity(self, entropy: float, node_count: int, edge_count: int):
+    def record_activity(self, entropy: float, node_count: int, edge_count: int) -> None:
         self.history.append({
             "timestamp": datetime.now(),
             "entropy": entropy,
@@ -29,8 +29,8 @@ class EpistemicLoadForecaster:
         
         # Predicted load = current density * (1 + trend)
         current_load = self.history[-1]["node_count"] / 1000.0 # Normalized
-        predicted_load = max(1.0, current_load * (1 + trend))
-        return predicted_load
+        predicted_load = max(1.0, current_load * (1 + cast(float, trend)))
+        return float(predicted_load)
 
 class BanditResourceAllocator:
     """
@@ -53,9 +53,9 @@ class BanditResourceAllocator:
             # Real implementation would use Contextual Bandits (Vowpal Wabbit style)
             idx = np.argmax(self.values)
         
-        return self.options[idx]
+        return int(self.options[idx])
 
-    def record_reward(self, replicas: int, p50_latency: float, cost: float):
+    def record_reward(self, replicas: int, p50_latency: float, cost: float) -> None:
         # Reward = 1 / (latency * cost)
         reward = 1.0 / (p50_latency * cost + 1e-6)
         idx = self.options.index(replicas)

@@ -2,18 +2,19 @@ import torch
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from typing import Dict, Any, Optional, Tuple, List, cast
 
 class GCNLayer(nn.Module):
     """
     A lightweight Graph Convolutional Network layer for fusing knowledge graph context.
     Uses a simple neighborhood aggregation: X' = sigma(A * X * W)
     """
-    def __init__(self, in_features, out_features):
+    def __init__(self, in_features: int, out_features: int) -> None:
         super(GCNLayer, self).__init__()
         self.linear = nn.Linear(in_features, out_features)
         self.relu = nn.ReLU()
 
-    def forward(self, node_features, adj_matrix):
+    def forward(self, node_features: torch.Tensor, adj_matrix: torch.Tensor) -> torch.Tensor:
         """
         Forward pass for GCN.
         node_features: [N, in_features]
@@ -26,25 +27,25 @@ class GCNLayer(nn.Module):
         return self.relu(output)
 
 class NeuroSemanticEncoder:
-    def __init__(self, model_name='all-MiniLM-L6-v2'):
+    def __init__(self, model_name: str = 'all-MiniLM-L6-v2') -> None:
         """
         Initializes the Neuro-Semantic Encoder.
         Fuses LLM-based semantic embeddings with GCN-based structural embeddings.
         """
         # MiniLM-L6-v2 produces 384-dim embeddings
-        self.transformer = SentenceTransformer(model_name)
+        self.transformer: SentenceTransformer = SentenceTransformer(model_name)
         
         # Projection layer to reach 768 dimensions as requested
-        self.projection = nn.Linear(384, 768)
+        self.projection: nn.Linear = nn.Linear(384, 768)
         
         # GCN layer for knowledge graph fusion
-        self.gcn = GCNLayer(768, 768)
+        self.gcn: GCNLayer = GCNLayer(768, 768)
         
         # Fusion layer to integrate text and graph context
-        self.fusion_gate = nn.Linear(768 * 2, 768)
-        self.layernorm = nn.LayerNorm(768)
+        self.fusion_gate: nn.Linear = nn.Linear(768 * 2, 768)
+        self.layernorm: nn.LayerNorm = nn.LayerNorm(768)
 
-    def encode(self, text, graph_context=None):
+    def encode(self, text: str, graph_context: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """
         Generates a 768-dimensional neuro-semantic embedding.
         
@@ -75,9 +76,9 @@ class NeuroSemanticEncoder:
             combined = torch.cat([projected_text, pooled_graph], dim=-1)
             fused = torch.tanh(self.fusion_gate(combined))
             final_emb = self.layernorm(fused)
-            return final_emb.detach().cpu().numpy()
+            return cast(np.ndarray, final_emb.detach().cpu().numpy())
         
-        return projected_text.detach().cpu().numpy()
+        return cast(np.ndarray, projected_text.detach().cpu().numpy())
 
     def prefix_payload(self, payload: bytes, embedding: np.ndarray) -> bytes:
         """
@@ -91,7 +92,7 @@ class NeuroSemanticEncoder:
         return emb_bytes + payload
 
     @staticmethod
-    def extract_embedding(raw_data: bytes):
+    def extract_embedding(raw_data: bytes) -> Tuple[np.ndarray, bytes]:
         """
         Separates the embedding prefix from the actual payload.
         """

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Any
 import sys
 import os
 
@@ -17,12 +18,12 @@ class SelfEvolutionService(NeuralActor):
     Responsible for recursive self-monitoring and fine-tuning of the 
     distributed cognitive substrate.
     """
-    async def on_start(self):
+    async def on_start(self) -> None:
         logger.info("Self-Evolution Context operational.")
         # Listen for system performance metrics for recursive optimization
         await self.listen("system.metrics", self.handle_metrics)
 
-    async def handle_metrics(self, payload, embedding):
+    async def handle_metrics(self, payload: Any, embedding: Any) -> None:
         """
         Analyzes system throughput and epistemic consistency trends 
         to trigger re-training or model updates.
@@ -34,7 +35,7 @@ class SelfEvolutionService(NeuralActor):
             logger.warning("Unacceptable error rate. Triggering neuro-semantic recalibration...")
             await self.send("system.recalibration", {"trigger": "error_threshold_breach"})
 
-async def main():
+async def main() -> None:
     service = SelfEvolutionService()
     try:
         await service.boot()

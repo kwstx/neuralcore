@@ -1,11 +1,12 @@
-
+from typing import Any
+from .vault import VaultKeyManager
 
 class AgeEncryption:
     """
     Implements end-to-end age-encryption for context snapshots.
     Uses per-tenant keys managed through Vault.
     """
-    def __init__(self, key_manager):
+    def __init__(self, key_manager: VaultKeyManager) -> None:
         self.key_manager = key_manager
 
     def encrypt(self, tenant_id: str, data: bytes) -> bytes:

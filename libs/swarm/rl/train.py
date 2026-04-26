@@ -1,14 +1,14 @@
 import gymnasium as gym
 import numpy as np
 from stable_baselines3 import PPO
-from typing import Dict, List
+from typing import Dict, List, Any, Tuple, Optional
 
-class SwarmWorkflowEnv(gym.Env):
+class SwarmWorkflowEnv(gym.Env[np.ndarray, int]):
     """
     Simulated business workflow environment for multi-objective RL.
     Optimizes handoffs and coordination strategies.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         super(SwarmWorkflowEnv, self).__init__()
         # Simplified action space: [agent_to_select, action_type]
         self.action_space = gym.spaces.Discrete(5) # 5 possible agents to hand off to
@@ -19,7 +19,7 @@ class SwarmWorkflowEnv(gym.Env):
         self.utility = 0.0
         self.coherence = 1.0
 
-    def reset(self, seed=None, options=None):
+    def reset(self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None) -> Tuple[np.ndarray, Dict[str, Any]]:
         super().reset(seed=seed)
         self.state = np.random.rand(10).astype(np.float32)
         self.latency = 0.0
@@ -27,7 +27,7 @@ class SwarmWorkflowEnv(gym.Env):
         self.coherence = 1.0
         return self.state, {}
 
-    def step(self, action):
+    def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
         # Simulate workflow progression based on action
         # This is where emergent behaviors are rewarded
         
@@ -49,7 +49,7 @@ class SwarmWorkflowEnv(gym.Env):
         
         return self.state, reward, done, False, {}
 
-def train_swarm_policy():
+def train_swarm_policy() -> None:
     """Optimizes the swarm orchestration policy using PPO."""
     env = SwarmWorkflowEnv()
     model = PPO("MlpPolicy", env, verbose=1)

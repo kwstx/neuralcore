@@ -7,15 +7,15 @@ class TamperProofLedger:
     Append-only tamper-proof ledger utilizing a blockchain-inspired structure.
     Uses ZK-SNARKs (Selective Disclosure) for privacy-preserving auditing.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.chain: List[Dict[str, Any]] = []
         self._initialize_genesis()
 
-    def _initialize_genesis(self):
+    def _initialize_genesis(self) -> None:
         genesis_block = self._create_block(data="Genesis Block", previous_hash="0")
         self.chain.append(genesis_block)
 
-    def log_event(self, actor: str, action: str, resource: str, decision: bool, metadata: Dict[str, Any]):
+    def log_event(self, actor: str, action: str, resource: str, decision: bool, metadata: Dict[str, Any]) -> str:
         """
         Appends a new event to the ledger with a cryptographic link to the previous block.
         """
@@ -30,7 +30,7 @@ class TamperProofLedger:
         previous_hash = self.chain[-1]['hash']
         block = self._create_block(data=event_data, previous_hash=previous_hash)
         self.chain.append(block)
-        return block['hash']
+        return str(block['hash'])
 
     def _create_block(self, data: Any, previous_hash: str) -> Dict[str, Any]:
         block = {

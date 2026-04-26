@@ -7,7 +7,7 @@ class MetaRouter:
     7B Parameter distilled model for <50ms query intent classification.
     Composes optimal context bundles by solving a weighted set cover problem.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         # In production, this would be a local inference call to a distilled model (e.g., Llama-7B-distilled)
         pass
 

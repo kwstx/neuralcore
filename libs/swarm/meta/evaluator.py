@@ -7,7 +7,7 @@ class BrainHealthAssessment:
     """
     Weekly evaluation harness for measuring common brain health metrics.
     """
-    def __init__(self, knowledge_graph: nx.Graph, causal_model: CausalWorldModel):
+    def __init__(self, knowledge_graph: nx.Graph, causal_model: CausalWorldModel) -> None:
         self.graph = knowledge_graph
         self.causal_model = causal_model
 
@@ -29,7 +29,7 @@ class BrainHealthAssessment:
         if len(self.graph) == 0:
             return 0.0
         # Simple modularity-like metric: average clustering coefficient
-        return nx.average_clustering(self.graph)
+        return float(nx.average_clustering(self.graph))
 
     def compute_actionability(self, simulated_decision_trees: List[Any]) -> float:
         """

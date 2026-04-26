@@ -8,7 +8,7 @@ class AgentModuleValidator:
     """
     Validates Agent Packs (Wasm) against tenant ontologies via formal SHACL checking.
     """
-    def __init__(self, ontology_path: str):
+    def __init__(self, ontology_path: str) -> None:
         self.ontology = rdflib.Graph()
         self.ontology.parse(ontology_path, format="ttl")
         
@@ -57,7 +57,7 @@ class WasmRuntime:
     """
     Sandboxed execution environment for third-party agent extensions.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.engine = wasmtime.Engine()
         self.store = wasmtime.Store(self.engine)
         self.linker = wasmtime.Linker(self.engine)

@@ -7,7 +7,7 @@ class TopazPDP:
     Evaluates Attribute-Based (ABAC) and Relationship-Based (ReBAC) policies.
     Consults the knowledge graph in real-time for context-aware decisions.
     """
-    def __init__(self, topaz_url: str = "http://topaz.local:8282"):
+    def __init__(self, topaz_url: str = "http://topaz.local:8282") -> None:
         self.topaz_url = topaz_url
 
     async def is_authorized(self, 
@@ -34,7 +34,7 @@ class TopazPDP:
                     }
                 )
                 if response.status_code == 200:
-                    return response.json().get("decision", False)
+                    return bool(response.json().get("decision", False))
             except Exception as e:
                 print(f"Topaz PDP error: {e}")
         

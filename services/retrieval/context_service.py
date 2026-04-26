@@ -1,11 +1,12 @@
 from libs.fabric.backbone import NeuroSemanticFabric
+from typing import Any, Dict, Optional
 import asyncio
 
 class ContextEngine:
-    def __init__(self, fabric: NeuroSemanticFabric):
+    def __init__(self, fabric: NeuroSemanticFabric) -> None:
         self.fabric = fabric
 
-    async def retrieve_context(self, query_text):
+    async def retrieve_context(self, query_text: str) -> Dict[str, Any]:
         """
         Retrieves relevant context using semantic routing and ontology reconciliation.
         """
@@ -17,9 +18,9 @@ class ContextEngine:
         
         # 3. Publish retrieval request to the fabric
         await self.fabric.publish_event(
-            topic="context.retrieval.request",
-            payload_dict={"query": query_text, "filters": {}},
-            semantic_context=query_text
+            subject="context.retrieval.request",
+            data={"query": query_text, "filters": {}},
+            graph_context={"query": query_text}
         )
         
         return {"status": "Retrieving context via fabric..."}

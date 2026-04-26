@@ -4,7 +4,7 @@ import logging
 import os
 import hashlib
 import numpy as np
-from typing import Annotated, Any, Dict, List, Union
+from typing import Annotated, Any, Dict, List, Union, Optional, Callable, Awaitable
 from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph, END
@@ -14,9 +14,10 @@ try:
     from .supervisor.swarm_supervisor import MetaSupervisor
 except ImportError:
     # Fallback for development if Rust lib isn't compiled
-    class MetaSupervisor:
-        def update_agent(self, state): pass
-        def decide_handoff(self, current_agent_id): return None
+    class MetaSupervisorFallback:
+        def update_agent(self, state: Any) -> None: pass
+        def decide_handoff(self, current_agent_id: str) -> Optional[str]: return None
+    MetaSupervisor = MetaSupervisorFallback # type: ignore
 
 from .memory.persistence import PersistentAgent
 from .governance import GovernanceDAG, ProvenanceRecord, ExecutionStatus
@@ -47,7 +48,7 @@ class SwarmOrchestrator:
     The proactive agent swarm orchestration engine.
     Extends LangGraph with a custom meta-reasoning supervisor.
     """
-    def __init__(self, agent_configs: List[Dict], tenant_id: str = "default-tenant"):
+    def __init__(self, agent_configs: List[Dict[str, Any]], tenant_id: str = "default-tenant") -> None:
         self.tenant_id = tenant_id
         self.supervisor = MetaSupervisor()
         self.registry = CapabilityRegistry("ontology/core.ttl")
@@ -67,7 +68,7 @@ class SwarmOrchestrator:
         self.distillation_node = FederatedAveragingNode(node_id="main-orchestrator-node")
         self.graph = self._build_graph()
 
-    def _build_graph(self):
+    def _build_graph(self) -> Any:
         """Constructs the hierarchical LangGraph."""
         builder = StateGraph(SwarmState)
         
@@ -95,7 +96,7 @@ class SwarmOrchestrator:
         
         return builder.compile()
 
-    def _agent_step(self, role: str):
+    def _agent_step(self, role: str) -> Callable[[SwarmState], Awaitable[Dict[str, Any]]]:
         """Wrapper for agent execution logic with zero-trust fabric."""
         @track_execution_latency(f"agent_{role}_execution")
         async def step(state: SwarmState):
@@ -181,7 +182,7 @@ class SwarmOrchestrator:
             return "executor"
         return "done"
 
-    async def execute_task(self, task: str):
+    async def execute_task(self, task: str) -> None:
         initial_state = {
             "current_agent": "researcher",
             "task_description": task,

@@ -7,13 +7,13 @@ class Neo4jTemporalGraph:
     Neo4j cluster client for temporal graph persistence where nodes carry
     vector embeddings, confidence scores, and provenance metadata.
     """
-    def __init__(self, uri: str = None, user: str = None, password: str = None):
+    def __init__(self, uri: Optional[str] = None, user: Optional[str] = None, password: Optional[str] = None) -> None:
         self.uri = uri or "bolt://localhost:7687"
         self.driver = GraphDatabase.driver(
             self.uri, auth=(user or "neo4j", password or "password")
         )
 
-    def close(self):
+    def close(self) -> None:
         self.driver.close()
 
     def create_unified_node(
@@ -24,7 +24,7 @@ class Neo4jTemporalGraph:
         embedding: List[float],
         confidence: float,
         provenance: str
-    ):
+    ) -> None:
         """
         Create a node with temporal stamps, embeddings, and epistemic metadata.
         """
@@ -36,8 +36,8 @@ class Neo4jTemporalGraph:
 
     @staticmethod
     def _upsert_node_tx(
-        tx, node_id, label, props, embedding, confidence, provenance
-    ):
+        tx: Any, node_id: str, label: str, props: Dict[str, Any], embedding: List[float], confidence: float, provenance: str
+    ) -> None:
         query = (
             f"MERGE (n:{label} {{id: $node_id}}) "
             "SET n += $props, "
@@ -63,7 +63,7 @@ class Neo4jTemporalGraph:
         target_id: str,
         rel_type: str,
         temporal_props: Dict[str, Any]
-    ):
+    ) -> None:
         """
         Establish a relationship with explicit temporal stamps.
         """
@@ -74,7 +74,7 @@ class Neo4jTemporalGraph:
             )
 
     @staticmethod
-    def _create_rel_tx(tx, source_id, target_id, rel_type, props):
+    def _create_rel_tx(tx: Any, source_id: str, target_id: str, rel_type: str, props: Dict[str, Any]) -> None:
         query = (
             "MATCH (a {id: $source_id}), (b {id: $target_id}) "
             f"MERGE (a)-[r:{rel_type}]->(b) "

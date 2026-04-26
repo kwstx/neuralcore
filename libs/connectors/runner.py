@@ -1,5 +1,5 @@
 import wasmtime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import threading
 
 class WasmConnectorRunner:
@@ -7,7 +7,7 @@ class WasmConnectorRunner:
     Executes third-party connectors as sandboxed WebAssembly modules
     using Wasmtime, isolated per tenant.
     """
-    def __init__(self, engine_config: Dict[str, Any] = None):
+    def __init__(self, engine_config: Optional[Dict[str, Any]] = None) -> None:
         config = wasmtime.Config()
         if engine_config:
             # Apply configuration for resource isolation etc.
@@ -20,7 +20,7 @@ class WasmConnectorRunner:
         self.linker.define_wasi()
         self.store.set_wasi(wasmtime.WasiConfig())
 
-    def run_connector(self, wasm_bytes: bytes, function_name: str, *args) -> Any:
+    def run_connector(self, wasm_bytes: bytes, function_name: str, *args: Any) -> Any:
         """
         Loads and executes a Wasm module in a sandboxed environment.
         """
@@ -37,7 +37,7 @@ class TenantIsolationManager:
     """
     Manages Wasmtime runtimes isolated per tenant.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self._tenants: Dict[str, WasmConnectorRunner] = {}
         self._lock = threading.Lock()
 
