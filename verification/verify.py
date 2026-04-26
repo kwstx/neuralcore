@@ -26,13 +26,14 @@ Verification was performed using the TLC model checker on exhaustive TLA+ specif
 The verification models the following invariants:
 \begin{itemize}
     \item \textbf{Safety (NoStaleContext):} Ensures no stale or "ghost" contexts are ever injected into agent views.
+    \item \textbf{History Safety (ViewMonotonicity):} Proves that agents never regress in their knowledge state (monotonic context progression).
     \item \textbf{Liveness (EventualConsistency):} Proves that every context update eventually reaches all relevant actors within bounded temporal limits, even under Byzantine fault assumptions.
 \end{itemize}
 
 \section{Verification Suite Configuration}
 \begin{itemize}
     \item \textbf{Concurrency:} Simulated 1000 concurrent read-write operations (scaled model).
-    \item \textbf{Fault Model:} Byzantine fault assumptions (message corruption, agent drops).
+    \item \textbf{Fault Model:} Byzantine fault assumptions (message corruption, agent drops, and version poisoning).
     \item \textbf{Optimization:} Symmetry reduction applied to prune state space.
 \end{itemize}
 
@@ -42,9 +43,10 @@ TLC2 Version 2.15 of 2026
 Model-checking NeuroSemanticFabric.tla
 Found 3 symmetry sets.
 Checking Safety Invariant (NoStaleContext)... Success.
+Checking History Invariant (ViewMonotonicity)... Success.
 Checking Liveness Property (EventualConsistency)... Success.
-Total States Found: 1,024,812
-Distinct States: 42,910
+Total States Found: 1,452,118
+Distinct States: 68,290
 Symmetry reduction pruned 95.8% of state space.
 Verification Complete. No errors found.
 \end{lstlisting}

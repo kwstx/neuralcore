@@ -26,8 +26,8 @@ Advanced pipelines for deep multi-modal understanding and automated service inte
 
 ## Security & Reliability
 - Zero-trust security with attribute-based policies
-- Merkle-tree reconciliation
-- Hardware enclaves for enterprise-grade compliance
+- **Merkle-tree reconciliation**: Uses Causal Dominance with Vector Clock tie-breaking to ensure deterministic conflict resolution during network re-joins.
+- **Hardware enclaves for enterprise-grade compliance**: All sensitive context reconciliation occurs within AWS Nitro Enclaves.
 
 ## Formal Verification
 Formal verification of the substrate is achieved through exhaustive TLA+ specifications that model the context propagation invariant as a temporal logic formula, proving both safety (no stale context is ever injected) and liveness (every update eventually reaches all relevant actors within bounded latency).

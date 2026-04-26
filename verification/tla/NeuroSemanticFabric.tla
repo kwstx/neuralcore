@@ -105,6 +105,9 @@ NextAgent(a) ==
         THEN \/ UNCHANGED vars
              \/ /\ agent_views' = [agent_views EXCEPT ![a][msg.context].version = -1]
                 /\ UNCHANGED <<fabric_state, network>>
+             \* Version Poisoning: Byzantine agent broadcasts a future version to confuse the fabric
+             \/ /\ network' = network \cup {[type |-> "update", context |-> msg.context, version |-> MaxUpdates + 1]}
+                /\ UNCHANGED <<fabric_state, agent_views>>
         ELSE IF msg.version > agent_views[a][msg.context].version
              THEN /\ agent_views' = [agent_views EXCEPT ![a][msg.context].version = msg.version]
                   /\ UNCHANGED <<fabric_state, network>>
@@ -124,6 +127,10 @@ EventualConsistency == \A c \in BoundedContexts :
     \A v \in 1..MaxUpdates :
         (fabric_state[c].version >= v) ~> 
         (\A a \in (Agents \ ByzantineAgents) : agent_views[a][c].version >= v)
+
+\* New: Ensure agents never regress in their knowledge (safety for history)
+ViewMonotonicity == [][\A a \in (Agents \ ByzantineAgents), c \in BoundedContexts : 
+    agent_views'[a][c].version >= agent_views[a][c].version]_vars
 
 \* Symmetry Reduction to prune state space
 AgentsSymmetry == Permutations(Agents)
