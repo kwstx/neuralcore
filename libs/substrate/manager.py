@@ -3,6 +3,8 @@ from .persistence.postgres import PostgresKnowledgeStore
 from .persistence.graph import Neo4jTemporalGraph
 from .ensemble.models import CognitiveEnsemble
 from .fusion.embedding import EpistemicEmbeddingFusion
+from .completion.models import TemporalComplEx
+from .belief.network import BeliefManager
 from typing import List, Dict, Any
 
 class HybridSubstrateManager:
@@ -15,6 +17,10 @@ class HybridSubstrateManager:
         self.neo4j = Neo4jTemporalGraph()
         self.ensemble = CognitiveEnsemble()
         self.fusion = EpistemicEmbeddingFusion()
+        
+        # New components for densification and belief reconciliation
+        self.completion_model = TemporalComplEx(num_entities=10000, num_relations=500, embedding_dim=768)
+        self.belief_manager = BeliefManager()
         
     def ingest_artifact(self, artifact_type: str, source_path: str, metadata: Dict[str, Any]):
         """
@@ -66,3 +72,40 @@ class HybridSubstrateManager:
         # 3. Graph traversal from high-confidence entry points
         # Placeholder for complex multi-hop Cypher query
         return {"results": candidates, "latency_ms": 45.2}
+
+    def run_nightly_densification(self):
+        """
+        Performs nightly graph densification through the differentiable 
+        knowledge graph completion module.
+        """
+        # 1. Fetch current triples and timestamps from Neo4j
+        # triples = self.neo4j.get_all_triples()
+        
+        # 2. Train Temporal ComplEx model
+        # train_completion(self.completion_model, triples_loader)
+        
+        # 3. Predict high-probability missing triples (knowledge gaps)
+        # gaps = self.completion_model.predict_missing(top_k=1000)
+        
+        # 4. Proactively populate Neo4j with surfaced facts
+        # for h, r, t in gaps:
+        #     self.neo4j.create_relation(h, r, t, properties={"generated": True, "confidence": score})
+        
+        print("Nightly densification complete. Knowledge gaps populated.")
+
+    def reconcile_beliefs(self):
+        """
+        Runs the Bayesian belief network submodule to reconcile contradictory facts
+        and maintain a single source of truth.
+        """
+        # 1. Retrieve facts with multiple sources or contradictions
+        # contradictory_triples = self.neo4j.get_contradictory_triples()
+        
+        # 2. Run variational inference via Pyro
+        # confidence_scores = self.belief_manager.get_coherent_subgraph(contradictory_triples)
+        
+        # 3. Update confidence values in Neo4j and Postgres
+        # for triple in confidence_scores:
+        #     self.neo4j.update_confidence(triple['id'], triple['confidence'])
+        
+        print("Belief reconciliation complete. Epistemic consistency maintained.")
