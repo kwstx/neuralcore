@@ -17,6 +17,13 @@ Coordinated through epistemic consensus and multi-objective reinforcement learni
 - Insight proposal
 - Self-refinement via closed-loop meta-learning and federated fine-tuning
 
+### Multi-modal Ingestion & Discovery
+Advanced pipelines for deep multi-modal understanding and automated service integration:
+- **Spatiotemporal meeting analysis**: Chains Whisper-large-v3 transcription with VideoMAE backbones to extract action items, decisions, and participant graphs as RDF triples.
+- **Automated Service Discovery**: LLM-based schema mapping engine that auto-detects new data sources and registers them into the ontology with zero manual configuration.
+- **Enclave-Protected Processing**: All ingestion occurs within AWS Nitro Enclaves or equivalent, ensuring zero-leakage of sensitive meeting metadata.
+
+
 ## Security & Reliability
 - Zero-trust security with attribute-based policies
 - Merkle-tree reconciliation

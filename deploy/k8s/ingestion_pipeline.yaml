@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: multimodal-ingestion-policy
+  namespace: neuralcore
+spec:
+  podSelector:
+    matchLabels:
+      app: multimodal-ingestion
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: internal-api
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    - podSelector:
+        matchLabels:
+          app: neo4j
+    ports:
+    - protocol: TCP
+      port: 5432
+    - protocol: TCP
+      port: 7687
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: enclave-keys
+  namespace: neuralcore
+spec:
+  encryptedData:
+    AES_KEY: AgA...fake_base64_data...
+    ATTESTATION_SALT: BgB...fake_base64_data...
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multimodal-ingestion
+  namespace: neuralcore
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: multimodal-ingestion
+  template:
+    metadata:
+      labels:
+        app: multimodal-ingestion
+      annotations:
+        # Requesting Nitro Enclave isolation via custom scheduler or node selector
+        aws.amazon.com/nitro-enclave: "enabled"
+    spec:
+      containers:
+      - name: pipeline
+        image: neuralcore/multimodal-ingestion:latest
+        env:
+        - name: ENCLAVE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: secure-memory
+          mountPath: /dev/hugepages
+      volumes:
+      - name: secure-memory
+        emptyDir:
+          medium: HugePages
