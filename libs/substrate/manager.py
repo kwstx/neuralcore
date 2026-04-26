@@ -5,7 +5,11 @@ from .ensemble.models import CognitiveEnsemble
 from .fusion.embedding import EpistemicEmbeddingFusion
 from .completion.models import TemporalComplEx
 from .belief.network import BeliefManager
-from typing import List, Dict, Any
+from libs.security.auth import OryIdentityManager
+from libs.security.policy import PolicyDecisionPoint
+from libs.connectors.runner import TenantIsolationManager
+from libs.sync.reconciler import EventReconciliationProtocol
+from typing import List, Dict, Any, Optional
 
 class HybridSubstrateManager:
     """
@@ -21,6 +25,12 @@ class HybridSubstrateManager:
         # New components for densification and belief reconciliation
         self.completion_model = TemporalComplEx(num_entities=10000, num_relations=500, embedding_dim=768)
         self.belief_manager = BeliefManager()
+
+        # Zero-setup integration and security components
+        self.identity_manager = OryIdentityManager()
+        self.pdp = PolicyDecisionPoint()
+        self.connector_manager = TenantIsolationManager()
+        self.reconciler = EventReconciliationProtocol()
         
     def ingest_artifact(self, artifact_type: str, source_path: str, metadata: Dict[str, Any]):
         """
