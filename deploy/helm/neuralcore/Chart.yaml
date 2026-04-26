@@ -10,7 +10,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
   - name: neo4j
     version: 4.4.x
-    repository: https://helm.neo4j.com/
+    repository: https://neo4j.github.io/helm-charts
   - name: kafka
     version: 23.x.x
     repository: https://charts.bitnami.com/bitnami

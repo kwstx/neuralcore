@@ -65,7 +65,11 @@ jobs:
           python-version: '3.10'
 
       - name: Update Helm Dependencies
-        run: helm dependency update deploy/helm/neuralcore
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add neo4j https://neo4j.github.io/helm-charts
+          helm repo update
+          helm dependency update deploy/helm/neuralcore
 
       - name: Lint Helm Chart
         run: helm lint deploy/helm/neuralcore
