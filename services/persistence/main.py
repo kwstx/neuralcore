@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 
 from libs.actor import NeuralActor
 from libs.ontology_service import EpistemicEngine
+from libs.utils.types import EmbeddingVector
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PersistenceContext")
@@ -20,28 +21,28 @@ class PersistenceService(NeuralActor):
     Isolates the storage and validation of the system's epistemic state.
     Utilizes a Hybrid Knowledge Substrate (Postgres + Neo4j) for scaling.
     """
-    def __init__(self, actor_id: str = "nc-persistence-01"):
+    def __init__(self, actor_id: str = "nc-persistence-01") -> None:
         super().__init__(actor_id=actor_id)
         # Initialize the OWL 2 DL ontology engine
-        self.epistemic_state = EpistemicEngine()
+        self.epistemic_state: EpistemicEngine = EpistemicEngine()
         # Initialize the next-gen hybrid substrate
-        self.substrate = HybridSubstrateManager()
+        self.substrate: HybridSubstrateManager = HybridSubstrateManager()
 
-    async def on_start(self):
+    async def on_start(self) -> None:
         logger.info("Initializing Persistence Context with Hybrid Substrate...")
         # Provision databases
         self.substrate.postgres.initialize()
         # Subscribe to knowledge ingestion events
         await self.listen("knowledge.ingest", self.handle_knowledge_ingest)
         
-    async def handle_knowledge_ingest(self, payload, embedding):
+    async def handle_knowledge_ingest(self, payload: dict[str, any], embedding: EmbeddingVector) -> None:
         """
         Handles incoming triples, ensures epistemic consistency, 
         and updates the substrate (Postgres/pgvector + Neo4j).
         """
-        body = payload.get('body', {})
-        triples = body.get('triples', [])
-        metadata = payload.get('header', {})
+        body: dict[str, any] = payload.get('body', {})
+        triples: list[tuple[str, str, str]] = body.get('triples', [])
+        metadata: dict[str, any] = payload.get('header', {})
         
         logger.info(f"Received {len(triples)} triples for substrate ingestion.")
         

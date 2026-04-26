@@ -1,0 +1,19 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://example.org/neuralcore#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:ActorShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NeuralActor ;
+    sh:property [
+        sh:path ex:hasId ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path ex:status ;
+        sh:in ("Active" "Inactive" "Error") ;
+        sh:minCount 1 ;
+    ] .

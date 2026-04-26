@@ -3,9 +3,7 @@ kafka-python
 nats-py
 torch
 dgl
-rdfapi
 rdflib
-pyowletpi
 pydantic
 langgraph
 pyshacl
@@ -13,3 +11,6 @@ stable-baselines3
 gymnasium
 numpy
 maturin
+mypy
+pylint
+pyshacl

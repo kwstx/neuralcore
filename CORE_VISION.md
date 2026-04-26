@@ -38,6 +38,14 @@ Formal verification of the substrate is achieved through exhaustive TLA+ specifi
 - **Neuro-Semantic Fabric Stability**: Ensures eventual consistency even during partial network partitions or sudden spikes in agent swarm activity.
 - **Audit & Compliance**: Proofs are automatically exported as human-readable LaTeX documents, serving as the bedrock for all subsequent layers and ensuring research-grade reliability before any production code is written.
 
+## Testing Strategy
+
+### 1. Static Code & Schema Analysis
+To ensure research-grade reliability, NeuralCore employs a multi-layered static verification suite:
+- **Strict Type Checking**: Leverages Mypy with `--strict` settings. Defines custom `EmbeddingVector` types to ensure 768-dimensional consistency and validates gRPC payloads without runtime execution.
+- **Aggressive Linting**: Uses Pylint to catch potential logical errors and maintain stylistic consistency across the distributed actor system.
+- **Ontology Verification**: Automated SHACL (Shapes Constraint Language) validation ensures the logic of the knowledge graph remains sound. Every ontological update is checked against consistency constraints using `pyshacl` to prevent epistemic conflicts.
+
 ## Self-Improving Intelligence Layer
 The intelligence layer operates as a closed-loop meta-learning subsystem, treating the company brain as a differentiable entity.
 - **Weekly Health Assessments**: Automated probes measuring:
