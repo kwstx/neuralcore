@@ -1,8 +1,10 @@
 import asyncio
 import json
 import logging
+import os
+import hashlib
 import numpy as np
-from typing import Annotated, Dict, List, Union
+from typing import Annotated, Any, Dict, List, Union
 from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph, END
@@ -20,6 +22,8 @@ from .memory.persistence import PersistentAgent
 from .governance import GovernanceDAG, ProvenanceRecord, ExecutionStatus
 from .observability import SwarmObservability, track_execution_latency
 from .rl.distillation import run_self_distillation_cycle, FederatedAveragingNode
+from .registry.service import CapabilityRegistry
+from .consensus.protocol import EpistemicConsensus, Proposal
 
 # Enterprise Security Fabric Imports
 from ..security.vault import VaultKeyManager
