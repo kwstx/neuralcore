@@ -51,11 +51,11 @@ process ContextUpdater \in BoundedContexts
 begin
 UpdateLoop:
     while fabric_state[self].version < MaxUpdates do
-        fabric_state[self].version := fabric_state[self].version + 1;
-        fabric_state[self].data := fabric_state[self].version * 7; \* Fake semantic payload
+        fabric_state[self] := [version |-> fabric_state[self].version + 1,
+                               data    |-> (fabric_state[self].version + 1) * 7] ||
         network := network \cup {[type |-> "update", 
                                   context |-> self, 
-                                  version |-> fabric_state[self].version]};
+                                  version |-> fabric_state[self].version + 1]};
     end while;
 end process;
 
@@ -94,8 +94,8 @@ Init == /\ fabric_state = [c \in BoundedContexts |-> [version |-> 0, data |-> 0]
 
 NextContext(c) == 
     /\ fabric_state[c].version < MaxUpdates
-    /\ fabric_state' = [fabric_state EXCEPT ![c].version = @.version + 1,
-                                            ![c].data = (@.version + 1) * 7]
+    /\ fabric_state' = [fabric_state EXCEPT ![c] = [version |-> @.version + 1,
+                                                    data    |-> (@.version + 1) * 7]]
     /\ network' = network \cup {[type |-> "update", context |-> c, version |-> fabric_state'[c].version]}
     /\ UNCHANGED agent_views
 
