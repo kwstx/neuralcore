@@ -1,0 +1,10 @@
+{
+  "meeting_id": "M-2026-0426-001",
+  "transcript": "User A: We need to increase the Kafka partition count. User B: Agreed, let's set it to 12 for the event-log topic.",
+  "metadata": {
+    "participants": ["User A", "User B"],
+    "date": "2026-04-26",
+    "priority": "high",
+    "domain": "infrastructure"
+  }
+}
