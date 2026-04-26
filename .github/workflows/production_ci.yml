@@ -41,8 +41,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          python3 -m pip install -r requirements.txt
 
       - name: Run Chaos Mesh Experiments
         run: |
@@ -50,7 +51,7 @@ jobs:
           echo "Injecting network latency into NATS cluster..."
           # chaos-mesh-cli run network-delay --duration 5m
           echo "Verifying epistemic consistency under partition..."
-          python -m pytest tests/chaos/test_consistency.py
+          python3 -m pytest tests/chaos/test_consistency.py
 
   build-and-package:
     runs-on: ubuntu-latest
@@ -71,5 +72,5 @@ jobs:
 
       - name: Validate Agent Marketplace Modules (SHACL)
         run: |
-          python -m pip install -r requirements.txt
-          python libs/marketplace/validator.py --check-all
+          python3 -m pip install -r requirements.txt
+          python3 libs/marketplace/validator.py --check-all
