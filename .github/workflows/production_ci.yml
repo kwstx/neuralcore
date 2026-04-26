@@ -34,6 +34,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
       - name: Run Chaos Mesh Experiments
         run: |
           # Simulated Chaos Engineering involving pod failure, network latency, and clock skew
@@ -47,6 +57,11 @@ jobs:
     needs: chaos-engineering
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Lint Helm Chart
         run: helm lint deploy/helm/neuralcore

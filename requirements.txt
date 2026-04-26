@@ -13,6 +13,6 @@ numpy
 maturin
 mypy
 pylint
-pyshacl
 bandit
 detect-secrets
+pytest
