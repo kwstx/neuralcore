@@ -1,0 +1,16 @@
+apiVersion: v2
+name: neuralcore
+description: NeuralCore - Cognitive AI Operating System
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: postgresql
+    version: 12.x.x
+    repository: https://charts.bitnami.com/bitnami
+  - name: neo4j
+    version: 4.4.x
+    repository: https://helm.neo4j.com/
+  - name: kafka
+    version: 23.x.x
+    repository: https://charts.bitnami.com/bitnami
