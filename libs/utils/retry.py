@@ -14,7 +14,7 @@ def exponential_backoff_with_jitter(
     """
     delay = min(max_delay, base_delay * (2 ** attempt))
     if jitter:
-        delay = random.uniform(0, delay)
+        delay = random.uniform(0, delay)  # nosec B311
     return delay
 
 async def retry_with_backoff(

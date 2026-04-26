@@ -15,7 +15,7 @@ class WebhookSensor(BaseSensorOperator):
 
     def poke(self, context):
         # Logic to check for new events at the endpoint
-        response = requests.get(self.endpoint)
+        response = requests.get(self.endpoint, timeout=10)
         if response.status_code == 200 and response.json().get("new_events"):
             context['ti'].xcom_push(key='events', value=response.json()["events"])
             return True

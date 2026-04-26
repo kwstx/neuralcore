@@ -21,4 +21,22 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Ontology verification failed!" -ForegroundColor Red
 }
 
+Write-Host "`n--- Running Security Linting (Bandit) ---" -ForegroundColor Cyan
+python -m bandit -r libs services
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Bandit failed!" -ForegroundColor Red
+}
+
+Write-Host "`n--- Running Secret Scanning (detect-secrets) ---" -ForegroundColor Cyan
+if (Test-Path .secrets.baseline) {
+    python -m detect_secrets scan --baseline .secrets.baseline .
+} else {
+    python -m detect_secrets scan .
+}
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Secret scanning failed!" -ForegroundColor Red
+}
+
 Write-Host "`nStatic Analysis Complete." -ForegroundColor Green

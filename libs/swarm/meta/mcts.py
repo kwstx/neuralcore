@@ -50,7 +50,7 @@ class BusinessScenarioMCTS:
 
     def _expand(self, node: Node, possible_actions: List[Dict[str, Any]]) -> Node:
         untried_actions = [a for a in possible_actions if a not in [child.state for child in node.children]]
-        action = random.choice(untried_actions)
+        action = random.choice(untried_actions)  # nosec B311
         new_state = node.state.copy()
         new_state.update(action)
         child = Node(new_state, parent=node)

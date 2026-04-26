@@ -53,7 +53,7 @@ class TamperProofLedger:
         Simulates ZK-SNARK proof that the block is validly constructed 
         without revealing sensitive 'data' fields during audit.
         """
-        return f"zk-snark-proof-{hashlib.md5(str(block['data']).encode()).hexdigest()}"
+        return f"zk-snark-proof-{hashlib.sha256(str(block['data']).encode()).hexdigest()}"
 
     def verify_chain(self) -> bool:
         """

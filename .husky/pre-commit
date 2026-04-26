@@ -1,0 +1,3 @@
+# Security scans
+python -m bandit -r libs services
+python -m detect_secrets scan --baseline .secrets.baseline .

@@ -41,7 +41,7 @@ class NeuroSemanticFabric:
             await self.js.add_stream(name="NEURALCORE", subjects=["neuralcore.>"])
         except Exception as e:
             # Stream might already exist
-            pass
+            pass  # nosec B110
 
     async def publish_event(self, subject: str, payload: dict, graph_context: dict = None):
         """

@@ -1,0 +1,12 @@
+{
+  "name": "neuralcore",
+  "version": "1.0.0",
+  "description": "Distributed Cognitive Substrate",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
