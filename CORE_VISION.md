@@ -38,11 +38,17 @@ Formal verification of the substrate is achieved through exhaustive TLA+ specifi
 - **Neuro-Semantic Fabric Stability**: Ensures eventual consistency even during partial network partitions or sudden spikes in agent swarm activity.
 - **Audit & Compliance**: Proofs are automatically exported as human-readable LaTeX documents, serving as the bedrock for all subsequent layers and ensuring research-grade reliability before any production code is written.
 
+## Self-Improving Intelligence Layer
+The intelligence layer operates as a closed-loop meta-learning subsystem, treating the company brain as a differentiable entity.
+- **Weekly Health Assessments**: Automated probes measuring:
+    - **Completeness**: Entity-relationship coverage ratios.
+    - **Coherence**: Graph modularity scores and semantic clustering quality.
+    - **Actionability**: Counterfactual success rates in simulated decision trees.
+- **Scenario Exploration**: A dedicated Monte Carlo Tree Search (MCTS) agent explores hypothetical business outcomes over the knowledge graph, ranking results by expected value (EV).
+- **Causal World Model**: Implemented as a Structural Causal Model (SCM) in DoWhy/Pyro, enabling high-fidelity counterfactual reasoning and intervention simulation.
+- **Federated Optimization**: Model updates for embeddings and agent policies are performed using differentially private federated learning (ε=1.0), enabling cross-company intelligence compounding while preserving tenant isolation.
+
 ## Intelligence Compounding
-The system compounds intelligence weekly through:
-- Brain health assessments
-- Monte Carlo simulations
-- Proactive orchestration of hundreds of agents
-- Predictive business foresight
+The system compounds intelligence weekly through the meta-learning coordinator, which triggers assessments, explores optimization paths, and aggregates private updates across the fleet.
 
 NeuralCore delivers exponential productivity gains, redefining how companies think, operate, and evolve as a unified epistemic entity.
