@@ -22,6 +22,15 @@ Coordinated through epistemic consensus and multi-objective reinforcement learni
 - Merkle-tree reconciliation
 - Hardware enclaves for enterprise-grade compliance
 
+## Formal Verification
+Formal verification of the substrate is achieved through exhaustive TLA+ specifications that model the context propagation invariant as a temporal logic formula, proving both safety (no stale context is ever injected) and liveness (every update eventually reaches all relevant actors within bounded latency).
+
+- **State Machine Modeling**: Defining state machines for each bounded context with PlusCal algorithms translated to TLA+.
+- **Race Condition Analysis**: The main specification checks for the absence of race conditions in multi-agent scenarios by simulating up to one thousand concurrent read-write operations under Byzantine fault assumptions.
+- **CI/CD Lifecycle**: The verification suite is executed in a CI pipeline using the TLC model checker with symmetry reduction to prune the state space, yielding machine-checkable proofs.
+- **Neuro-Semantic Fabric Stability**: Ensures eventual consistency even during partial network partitions or sudden spikes in agent swarm activity.
+- **Audit & Compliance**: Proofs are automatically exported as human-readable LaTeX documents, serving as the bedrock for all subsequent layers and ensuring research-grade reliability before any production code is written.
+
 ## Intelligence Compounding
 The system compounds intelligence weekly through:
 - Brain health assessments

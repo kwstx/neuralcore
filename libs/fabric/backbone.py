@@ -1,50 +1,116 @@
 import asyncio
-from kafka import KafkaProducer, KafkaConsumer
+import json
+import numpy as np
+from kafka import KafkaProducer
 from nats.aio.client import Client as NATS
 from .embedding_engine import NeuroSemanticEncoder
-import json
 
 class NeuroSemanticFabric:
+    """
+    The foundational distributed cognitive substrate of NeuralCore.
+    A hybrid event-driven actor-model backbone integrating Kafka and NATS JetStream.
+    
+    Attributes:
+        encoder (NeuroSemanticEncoder): Computes 768-dim knowledge graph embeddings.
+        kafka_producer (KafkaProducer): Handles high-throughput event ordering.
+        js (JetStreamContext): Handles low-latency, at-least-once delivery guarantees.
+    """
     def __init__(self, kafka_bootstrap='localhost:9092', nats_url='nats://localhost:4222'):
-        self.kafka_producer = KafkaProducer(bootstrap_servers=kafka_bootstrap)
+        # Kafka for global event ordering and log persistence
+        self.kafka_producer = KafkaProducer(
+            bootstrap_servers=kafka_bootstrap,
+            compression_type='gzip',
+            value_serializer=None # We handle prefixing ourselves
+        )
         self.nats_client = NATS()
         self.nats_url = nats_url
         self.encoder = NeuroSemanticEncoder()
+        self.js = None
 
     async def connect(self):
-        await self.nats_client.connect(self.nats_url)
+        """Initializes NATS connection and JetStream context."""
+        await self.nats_client.connect(
+            self.nats_url,
+            reconnect_time_wait=2,
+            max_reconnect_attempts=60
+        )
         self.js = self.nats_client.jetstream()
-
-    async def publish_event(self, topic, payload_dict, semantic_context=""):
-        """
-        Publishes an event with embedding-based routing.
-        Uses Kafka for ordering and NATS JetStream for delivery.
-        """
-        # 1. Generate Semantic Embedding
-        embedding = self.encoder.encode(semantic_context)
         
-        # 2. Prepare Payload
-        content = json.dumps(payload_dict).encode('utf-8')
-        prefixed_payload = self.encoder.prefix_payload(content, embedding)
-        
-        # 3. Publish to Kafka (Ordering)
-        self.kafka_producer.send(topic, prefixed_payload)
-        
-        # 4. Publish to NATS JetStream (At-least-once delivery)
-        await self.js.publish(topic, prefixed_payload)
+        # Ensure the cognitive substrate stream is initialized
+        try:
+            await self.js.add_stream(name="NEURALCORE", subjects=["neuralcore.>"])
+        except Exception as e:
+            # Stream might already exist
+            pass
 
-    async def subscribe(self, topic, callback):
+    async def publish_event(self, subject: str, payload: dict, graph_context: dict = None):
         """
-        Subscribes to a topic via NATS JetStream.
+        Publishes an event into the Fabric with semantic metadata.
+        
+        Args:
+            subject (str): The routing subject (e.g., 'agent.creation').
+            payload (dict): The event data.
+            graph_context (dict, optional): Knowledge graph context for GCN fusion.
         """
-        sub = await self.js.subscribe(topic, cb=callback)
-        return sub
+        # 1. Compute Semantic Vector (LLM + GCN)
+        # We use a string representation of the payload for semantic analysis
+        semantic_data = payload.get('description', json.dumps(payload))
+        embedding = self.encoder.encode(semantic_data, graph_context=graph_context)
+        
+        # 2. Fabric Prefixing
+        # Construct the wire-format: [3072 bytes embedding] + [JSON payload]
+        raw_payload = json.dumps(payload).encode('utf-8')
+        wire_data = self.encoder.prefix_payload(raw_payload, embedding)
+        
+        # 3. Distributed Log Sequencing (Kafka)
+        # Ensures a single coherent temporal ordering of all system events
+        self.kafka_producer.send(
+            'neuralcore-event-log', 
+            wire_data, 
+            key=subject.encode('utf-8')
+        )
+        
+        # 4. Low-Latency Pub-Sub (NATS JetStream)
+        # Provides at-least-once delivery and dynamic semantic routing
+        await self.js.publish(f"neuralcore.{subject}", wire_data)
+        
+        # Note: Kafka flush is handled asynchronously by the producer's background thread
+        # for maximum throughput, but we could flush here if strict durability is required.
 
-    def extract_embedding(self, raw_payload: bytes):
+    async def subscribe(self, subject: str, callback, queue_group: str = None):
         """
-        Helper to separate the 768-float embedding from the payload.
+        Subscribes to a subject with automatic embedding extraction.
+        
+        Args:
+            subject (str): Subject pattern to subscribe to (e.g., 'agent.*').
+            callback (coroutine): Function to handle (payload, embedding).
+            queue_group (str, optional): For load-balanced consumer groups.
         """
-        emb_size = 768 * 4 # 768 floats * 4 bytes each
-        embedding = np.frombuffer(raw_payload[:emb_size], dtype=np.float32)
-        payload = raw_payload[emb_size:]
-        return embedding, payload
+        async def internal_cb(msg):
+            try:
+                # Extract the 768-dim semantic header
+                embedding, raw_payload = NeuroSemanticEncoder.extract_embedding(msg.data)
+                payload = json.loads(raw_payload.decode('utf-8'))
+                
+                # Execute the bound actor logic or agent handler
+                await callback(payload, embedding)
+                
+                # Acknowledge completion for at-least-once reliability
+                await msg.ack()
+            except Exception as e:
+                # Basic error handling for malformed events
+                print(f"Error processing fabric event on {subject}: {e}")
+                # We do not ack, allowing for retry according to JetStream policy
+
+        return await self.js.subscribe(
+            f"neuralcore.{subject}",
+            queue=queue_group,
+            cb=internal_cb,
+            manual_ack=True
+        )
+
+    def shutdown(self):
+        """Graceful termination of fabric components."""
+        self.kafka_producer.flush()
+        self.kafka_producer.close()
+        # NATS client closing should be handled by the event loop

@@ -1,52 +1,73 @@
-import os
 import asyncio
-from nats.aio.client import Client as NATS
-from nats.aio.errors import ErrTimeout, ErrNoServers
 import logging
+import sys
+import os
+
+# Ensure the library path is accessible
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from libs.actor import NeuralActor
+from libs.ontology_service import EpistemicEngine
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("PersistenceService")
+logger = logging.getLogger("PersistenceContext")
 
-class PersistenceService:
-    def __init__(self):
-        self.nc = NATS()
-        self.nats_url = os.getenv("NATS_URL", "nats://localhost:4222")
+class PersistenceService(NeuralActor):
+    """
+    DDD Bounded Context: Knowledge Persistence.
+    Isolates the storage and validation of the system's epistemic state.
+    Prevents crosstalk by confining knowledge updates to this context.
+    """
+    def __init__(self, actor_id: str = "nc-persistence-01"):
+        super().__init__(actor_id=actor_id)
+        # Initialize the OWL 2 DL ontology engine
+        self.epistemic_state = EpistemicEngine()
 
-    async def connect(self):
-        try:
-            await self.nc.connect(self.nats_url)
-            logger.info(f"Connected to NATS at {self.nats_url}")
-            self.js = self.nc.jetstream()
-            
-            # Ensure the stream exists for persistence
-            await self.js.add_stream(name="NEURALCORE_EVENTS", subjects=["nc.events.*"])
-            logger.info("NeuralCore Event Stream initialized.")
-        except Exception as e:
-            logger.error(f"Failed to connect to NATS: {e}")
-
-    async def process_event(self, msg):
-        subject = msg.subject
-        data = msg.data
-        logger.info(f"Received event on {subject}: {len(data)} bytes")
-        # TODO: Implement event sourcing logic and Knowledge Graph projection
-        await msg.ack()
-
-    async def run(self):
-        await self.connect()
-        # Create a pull subscription for at-least-once delivery guarantees
-        self.sub = await self.js.pull_subscribe("nc.events.>", "persistence-worker")
+    async def on_start(self):
+        logger.info("Initializing Persistence Context...")
+        # Subscribe to knowledge ingestion events with wildcard support
+        await self.listen("knowledge.ingest", self.handle_knowledge_ingest)
         
-        while True:
-            try:
-                msgs = await self.sub.fetch(10, timeout=1)
-                for msg in msgs:
-                    await self.process_event(msg)
-            except ErrTimeout:
-                continue
-            except Exception as e:
-                logger.error(f"Error in event loop: {e}")
-                await asyncio.sleep(1)
+    async def handle_knowledge_ingest(self, payload, embedding):
+        """
+        Handles incoming triples, ensures epistemic consistency, 
+        and updates the long-term knowledge graph.
+        """
+        # Actor data structure: { "header": {...}, "body": { "triples": [...] } }
+        body = payload.get('body', {})
+        triples = body.get('triples', [])
+        
+        logger.info(f"Received {len(triples)} triples for ingestion.")
+        
+        # 1. Update the Epistemic State (Centralized yet decentralized pub-sub backbone)
+        self.epistemic_state.ingest_triples(triples)
+        
+        # 2. Epistemic Consistency Check (Safety Invariant)
+        # Ensures the entire system behaves as a single coherent epistemic entity
+        if self.epistemic_state.check_logical_consistency():
+            logger.info("Epistemic state verified as consistent.")
+            # Acknowledge successful anchoring
+            await self.send("persistence.committed", {
+                "result": "success",
+                "triples_anchored": len(triples),
+                "causal_link": payload.get('header', {}).get('sender')
+            })
+        else:
+            logger.warning("Ontological conflict detected. Rejecting update.")
+            await self.send("persistence.conflict", {
+                "result": "rejected",
+                "error": "logical_inconsistency"
+            })
+
+async def main():
+    service = PersistenceService()
+    try:
+        await service.boot()
+        # Keep the service alive
+        while service.is_active:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        await service.shutdown()
 
 if __name__ == "__main__":
-    service = PersistenceService()
-    asyncio.run(service.run())
+    asyncio.run(main())
