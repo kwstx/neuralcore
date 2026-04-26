@@ -1,0 +1,16 @@
+[package]
+name = "swarm_supervisor"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "swarm_supervisor"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+raft = "0.7" # For the consensus logic if needed here, but usually Raft is across nodes.
+# Let's use a simpler approach for the meta-reasoner.

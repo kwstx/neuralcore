@@ -7,3 +7,9 @@ rdfapi
 rdflib
 pyowletpi
 pydantic
+langgraph
+pyshacl
+stable-baselines3
+gymnasium
+numpy
+maturin

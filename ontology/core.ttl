@@ -43,3 +43,22 @@
 
 ###  http://neuralcore.ai/ontology#KnowledgeFragment
 :KnowledgeFragment rdf:type owl:Class .
+
+#################################################################
+#    SHACL Shapes
+#################################################################
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+:CapabilityShape
+    rdf:type sh:NodeShape ;
+    sh:targetClass :Capability ;
+    sh:property [
+        sh:path :hasName ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path :hasInputSchema ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+    ] .
