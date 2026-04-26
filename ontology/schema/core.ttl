@@ -1,0 +1,48 @@
+@prefix : <http://neuralcore.ai/ontology/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://neuralcore.ai/ontology/core> .
+
+<http://neuralcore.ai/ontology/core> rdf:type owl:Ontology ;
+                                      owl:versionInfo "0.1.0" ;
+                                      rdfs:comment "Foundational ontology for NeuralCore - A living cognitive operating system." .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://neuralcore.ai/ontology/core#enables
+:enables rdf:type owl:ObjectProperty ;
+         rdfs:domain :Event ;
+         rdfs:range :Event ;
+         rdfs:comment "Causal predicate: Event A enables Event B." .
+
+
+###  http://neuralcore.ai/ontology/core#precedes
+:precedes rdf:type owl:ObjectProperty ,
+                   owl:TransitiveProperty ;
+          rdfs:domain :Event ;
+          rdfs:range :Event ;
+          rdfs:comment "Temporal predicate: Event A occurs before Event B." .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://neuralcore.ai/ontology/core#Agent
+:Agent rdf:type owl:Class ;
+       rdfs:comment "A cognitive actor within the NeuralCore swarm." .
+
+
+###  http://neuralcore.ai/ontology/core#Event
+:Event rdf:type owl:Class ;
+       rdfs:comment "A discrete occurrence within the Neuro-Semantic Fabric." .
+
+
+###  http://neuralcore.ai/ontology/core#KnowledgePoint
+:KnowledgePoint rdf:type owl:Class ;
+                rdfs:comment "A specific piece of information or triple in the knowledge graph." .

@@ -1,0 +1,66 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cognitivesubstrates.neuralcore.ai
+spec:
+  group: neuralcore.ai
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                kafkaClusters:
+                  type: integer
+                  minimum: 1
+                natsReplicas:
+                  type: integer
+                  minimum: 1
+                storageBackend:
+                  type: string
+                  enum: [graphdb, jena, neo4j]
+  scope: Namespaced
+  names:
+    plural: cognitivesubstrates
+    singular: cognitivesubstrate
+    kind: CognitiveSubstrate
+    shortNames:
+      - cs
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentswarms.neuralcore.ai
+spec:
+  group: neuralcore.ai
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                agentType:
+                  type: string
+                minAgents:
+                  type: integer
+                maxAgents:
+                  type: integer
+                embeddingFused:
+                  type: boolean
+  scope: Namespaced
+  names:
+    plural: agentswarms
+    singular: agentswarm
+    kind: AgentSwarm
+    shortNames:
+      - swarm
