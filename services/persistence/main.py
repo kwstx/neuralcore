@@ -12,52 +12,61 @@ from libs.ontology_service import EpistemicEngine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PersistenceContext")
 
+from libs.substrate.manager import HybridSubstrateManager
+
 class PersistenceService(NeuralActor):
     """
     DDD Bounded Context: Knowledge Persistence.
     Isolates the storage and validation of the system's epistemic state.
-    Prevents crosstalk by confining knowledge updates to this context.
+    Utilizes a Hybrid Knowledge Substrate (Postgres + Neo4j) for scaling.
     """
     def __init__(self, actor_id: str = "nc-persistence-01"):
         super().__init__(actor_id=actor_id)
         # Initialize the OWL 2 DL ontology engine
         self.epistemic_state = EpistemicEngine()
+        # Initialize the next-gen hybrid substrate
+        self.substrate = HybridSubstrateManager()
 
     async def on_start(self):
-        logger.info("Initializing Persistence Context...")
-        # Subscribe to knowledge ingestion events with wildcard support
+        logger.info("Initializing Persistence Context with Hybrid Substrate...")
+        # Provision databases
+        self.substrate.postgres.initialize()
+        # Subscribe to knowledge ingestion events
         await self.listen("knowledge.ingest", self.handle_knowledge_ingest)
         
     async def handle_knowledge_ingest(self, payload, embedding):
         """
         Handles incoming triples, ensures epistemic consistency, 
-        and updates the long-term knowledge graph.
+        and updates the substrate (Postgres/pgvector + Neo4j).
         """
-        # Actor data structure: { "header": {...}, "body": { "triples": [...] } }
         body = payload.get('body', {})
         triples = body.get('triples', [])
+        metadata = payload.get('header', {})
         
-        logger.info(f"Received {len(triples)} triples for ingestion.")
+        logger.info(f"Received {len(triples)} triples for substrate ingestion.")
         
-        # 1. Update the Epistemic State (Centralized yet decentralized pub-sub backbone)
+        # 1. Update the Epistemic State
         self.epistemic_state.ingest_triples(triples)
         
-        # 2. Epistemic Consistency Check (Safety Invariant)
-        # Ensures the entire system behaves as a single coherent epistemic entity
+        # 2. Epistemic Consistency Check
         if self.epistemic_state.check_logical_consistency():
-            logger.info("Epistemic state verified as consistent.")
-            # Acknowledge successful anchoring
+            # 3. Commit to Hybrid Substrate
+            # We treat the entire batch as a unified artifact for this demo
+            self.substrate.ingest_artifact(
+                artifact_type="knowledge_graph",
+                source_path=metadata.get("sender", "unknown"),
+                metadata={"triples_count": len(triples), **metadata}
+            )
+            
+            logger.info("Epistemic state and substrate storage updated.")
             await self.send("persistence.committed", {
                 "result": "success",
                 "triples_anchored": len(triples),
-                "causal_link": payload.get('header', {}).get('sender')
+                "substrate_status": "synced"
             })
         else:
-            logger.warning("Ontological conflict detected. Rejecting update.")
-            await self.send("persistence.conflict", {
-                "result": "rejected",
-                "error": "logical_inconsistency"
-            })
+            logger.warning("Ontological conflict. Rejecting update.")
+            await self.send("persistence.conflict", {"error": "logical_inconsistency"})
 
 async def main():
     service = PersistenceService()
