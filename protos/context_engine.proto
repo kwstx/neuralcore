@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package neuralcore.context.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+service UniversalContextService {
+  // Primary endpoint for the Universal Context Protocol
+  rpc GetContext(ContextRequest) returns (ContextResponse);
+  
+  // MCP Fallback endpoints
+  rpc ListTools(google.protobuf.Empty) returns (ListToolsResponse);
+  rpc CallTool(CallToolRequest) returns (CallToolResponse);
+}
+
+message ContextRequest {
+  string query = 1;
+  string session_id = 2;
+  map<string, string> metadata = 3;
+  ContextConstraints constraints = 4;
+}
+
+message ContextConstraints {
+  int32 max_tokens = 1;
+  float min_fidelity = 2;
+  repeated string preferred_sources = 3;
+}
+
+message ContextResponse {
+  string context_bundle = 1;
+  bytes compressed_snapshot = 2; // Dynamic compressed context snapshot
+  float fidelity_score = 3;
+  RetrievalMetrics metrics = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+message RetrievalMetrics {
+  double latency_ms = 1;
+  int32 source_count = 2;
+  float similarity_score = 3;
+}
+
+message ListToolsResponse {
+  repeated Tool tools = 1;
+}
+
+message Tool {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Struct input_schema = 3;
+}
+
+message CallToolRequest {
+  string name = 1;
+  google.protobuf.Struct arguments = 2;
+}
+
+message CallToolResponse {
+  string content = 1;
+  bool is_error = 2;
+}
